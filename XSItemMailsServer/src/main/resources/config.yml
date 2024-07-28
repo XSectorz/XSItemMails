@@ -1,0 +1,20 @@
+database:
+  host: localhost
+  port: 3306
+  dbName: xsitemmails
+  user: root
+  password: 992545tai
+
+redis:
+  host: localhost
+  port: 6379
+  password: ''
+
+
+#each group will separate database
+group-servers:
+  survival:
+    - survival/01
+    - survival/02
+  lobby:
+    - lobby/01

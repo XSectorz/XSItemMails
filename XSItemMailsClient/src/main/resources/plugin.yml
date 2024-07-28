@@ -1,0 +1,4 @@
+name: XSItemMailsClient
+version: '${project.version}'
+main: net.xsapi.panat.xsitemmailsclient.core
+api-version: '1.21'
