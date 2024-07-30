@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/XSItemMails.iml" filepath="$PROJECT_DIR$/.idea/XSItemMails.iml" />
+      <module fileurl="file://$PROJECT_DIR$/XSItemMailsClient/XSItemMailsClient.iml" filepath="$PROJECT_DIR$/XSItemMailsClient/XSItemMailsClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/XSItemMailsServer/XSItemMailsServer.iml" filepath="$PROJECT_DIR$/XSItemMailsServer/XSItemMailsServer.iml" />
     </modules>
   </component>
 </project>

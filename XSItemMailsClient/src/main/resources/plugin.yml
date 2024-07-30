@@ -2,3 +2,9 @@ name: XSItemMailsClient
 version: '${project.version}'
 main: net.xsapi.panat.xsitemmailsclient.core
 api-version: '1.21'
+author: Panat XSectorZ
+commands:
+  xsitemmails:
+    description: main command for this plugin
+    aliases:
+      - itemmails
