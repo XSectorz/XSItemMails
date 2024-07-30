@@ -1,0 +1,50 @@
+
+
+settings:
+  title: "<dark_gray>Rewards creator"
+  size: 27
+  additional_info:
+    preview_display_items: 4
+  additional_contents:
+    back_to_main_menu:
+      material: custom_head-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjc1NDgzNjJhMjRjMGZhODQ1M2U0ZDkzZTY4YzU5NjlkZGJkZTU3YmY2NjY2YzAzMTljMWVkMWU4NGQ4OTA2NSJ9fX0=
+      amount: 1
+      customModelData: 0
+      slot: 22
+      display: "<color:#DF143D>ปิดหน้าเมนู"
+      lore: [ ]
+    items_reward:
+      material: custom_head-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2UyZWI0NzUxZTNjNTBkNTBmZjE2MzUyNTc2NjYzZDhmZWRmZTNlMDRiMmYwYjhhMmFhODAzYjQxOTM2M2NhMSJ9fX0=
+      amount: 1
+      slot: 11
+      customModelData: 0
+      display: "<color:#03BA00>ไอเทมที่จะได้รับ"
+      lore:
+        - "<gray>ตั้งค่าไอเทมที่จะได้รับเมื่อใช้งานคำสั่ง"
+        - "<gray>สามารถใส่ไอเทมเอนชานต์ หรือ ไอเทมสกิลได้"
+        - ""
+        - "<color:#03BA00>▪ <gray>ปัจจุบันมีไอเทม: <color:#03BA00>%items_reward_amount% <gray>ชิ้น"
+        - ""
+        - "<color:#03BA00>[▶] <gray>คลิก <color:#03BA00>ซ้าย <gray>เพื่อเข้าสู่หน้าจัดการไอเทม"
+    commands_reward:
+      material: custom_head-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDBkNWE0ZWJhMTQwY2JiMzRkNDVlNDBkNjJkZDNmN2U2NTg0YjJhYjBiNDE1NWEwYmNjNjAzZDVkNzUwZjc5MyJ9fX0=
+      amount: 1
+      slot: 15
+      customModelData: 0
+      display: "<color:#03BA00>คำสั่งที่จะได้รับ"
+      lore:
+        - "<gray>ตั้งค่าคำสั่งที่จะใช้งานเมื่อรันคำสั่ง"
+        - ""
+        - "<color:#03BA00>เงื่อนไข"
+        - "<color:#03BA00>▪ <gray>[CONSOLE] ใช้สำหรับแทนการรันคำสั่งโดยเซิฟเวอร์"
+        - "<color:#03BA00>▪ <gray>[PLAYER] ใช้สำหรับแทนการรันคำสั่งโดยผู้เล่น"
+        - "<color:#03BA00>▪ <gray>%player% สำหรับแทนที่ชื่อผู้เล่นอัติโนมัติ"
+        - ""
+        - "<color:#03BA00>ตัวอย่างการใช้งาน"
+        - "<color:#03BA00>▪ <gray>[CONSOLE] give %player% diamond 64"
+        - ""
+        - "<color:#03BA00>▪ <gray>ปัจจุบันมีคำสั่ง: <color:#03BA00>%commands_reward_amount% <gray>คำสั่ง"
+        - "%commands_lists%"
+        - ""
+        - "<color:#03BA00>[▶] <gray>คลิก <color:#03BA00>ซ้าย <gray>เพื่อเพิ่มคำสั่ง"
+        - "<color:#03BA00>[▶] <gray>คลิก <color:#03BA00>ขวา <gray>เพื่อลบคำสั่งออก"

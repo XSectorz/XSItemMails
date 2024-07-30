@@ -10,7 +10,6 @@ redis:
   port: 6379
   password: ''
 
-
 #each group will separate database
 group-servers:
   survival:

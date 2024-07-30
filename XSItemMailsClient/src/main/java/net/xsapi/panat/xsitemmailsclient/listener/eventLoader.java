@@ -8,6 +8,7 @@ public class eventLoader {
     public eventLoader() {
 
         Bukkit.getPluginManager().registerEvents(new onInventory(), core.getPlugin());
+        Bukkit.getPluginManager().registerEvents(new onPlayerChat(), core.getPlugin());
 
     }
 

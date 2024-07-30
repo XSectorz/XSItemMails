@@ -70,6 +70,13 @@ public class XSRedisHandler {
                         }
 
                         if(channel.startsWith(channelName)) {
+
+                            XS_REDIS_MESSAGES xsRedisMessages = XS_REDIS_MESSAGES.valueOf(message.split("<SPLIT>")[0]);
+
+                            if(xsRedisMessages.equals(XS_REDIS_MESSAGES.CREATE_ITEM)) {
+
+                            }
+
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));
                         }
 

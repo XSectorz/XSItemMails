@@ -5,3 +5,13 @@ redis:
 
 configuration:
   server: lobby/01
+
+settings:
+  default_preview_items:
+    material: DIAMOND_SWORD
+    amount: 1
+    customModelData: 0
+    display: "<color:#03BA00>ไอเทมตัวอย่าง"
+    lore:
+      - "<gray>คุณสามารถแก้ไขไอเทมตัวอย่างนี้"
+      - "<gray>ได้โดยการลากไอเทมมาวางทับในหน้าจัดการ"

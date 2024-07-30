@@ -2,9 +2,11 @@ package net.xsapi.panat.xsitemmailsclient.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,9 +18,14 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,6 +35,42 @@ public class XSUtils {
         Component parsedMessage = MiniMessage.builder().build().deserialize(str);
         String legacy = LegacyComponentSerializer.legacyAmpersand().serialize(parsedMessage);
         return legacy.replace('&', '§');
+    }
+
+    public static String itemStackToBase64(ItemStack itemStack) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeObject(itemStack);
+            String base64 = Base64.getEncoder().encodeToString(outputStream.toByteArray());
+            dataOutput.close();
+            outputStream.close();
+
+            return base64;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void sendMessageFromConfig(String path,Player p) {
+        Audience senderAudience = (Audience) p;
+        senderAudience.sendMessage(MiniMessage.builder().build().deserialize(messagesConfig.customConfig.getString("prefix") + messagesConfig.customConfig.getString(path)));
+    }
+
+    public static ItemStack itemStackFromBase64(String base64) {
+        try {
+            byte[] bytes = Base64.getDecoder().decode(base64);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack itemStack = (ItemStack) dataInput.readObject();
+            dataInput.close();
+            inputStream.close();
+            return itemStack;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static Inventory createInventoryFromConfig(FileConfiguration file,Player p) {

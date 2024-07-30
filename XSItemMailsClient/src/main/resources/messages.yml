@@ -1,0 +1,3 @@
+
+prefix: "<color:#03BA00><bold>XSItemMails</bold></color:#03BA00> <dark_gray>▸ <reset>"
+input_name: "<white>กรุณากรอกชื่อไอเทมที่คุณต้องการ <click:run_command:/xsitemmails cancel create><hover:show_text:'<color:#03BA00>คลิกเพื่อดำเนินการ'><color:#03BA00>[คลิกเพื่อยกเลิก]</hover></click>"

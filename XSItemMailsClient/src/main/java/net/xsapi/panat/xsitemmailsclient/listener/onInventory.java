@@ -1,8 +1,11 @@
 package net.xsapi.panat.xsitemmailsclient.listener;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
+import net.xsapi.panat.xsitemmailsclient.handler.XS_ITEMS_EDITOR_TOPICS;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +35,10 @@ public class onInventory implements Listener {
                         XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)-1);
                     }
                 } else if(key.equalsIgnoreCase("create")) {
-
+                    //p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p));
+                    XSHandler.getPlayerCreatorTopics().put(p, XS_ITEMS_EDITOR_TOPICS.INPUT_NAME);
+                    p.closeInventory();
+                    XSUtils.sendMessageFromConfig("input_name",p);
                 }
 
             }
