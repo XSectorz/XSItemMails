@@ -43,6 +43,7 @@ public class XSDatabaseHandler {
 
     private final static String ITEM_TABLE_SQL_QUERY = " ("
             + "id INT PRIMARY KEY AUTO_INCREMENT, "
+            + "itemName TEXT, "
             + "itemDisplay TEXT, "
             + "rewardItems TEXT, "
             + "rewardCommands TEXT "

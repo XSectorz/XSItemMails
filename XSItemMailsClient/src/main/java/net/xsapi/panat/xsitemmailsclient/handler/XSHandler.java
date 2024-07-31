@@ -4,7 +4,9 @@ import net.xsapi.panat.xsitemmailsclient.commands.commandLoader;
 import net.xsapi.panat.xsitemmailsclient.config.configLoader;
 import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.listener.eventLoader;
+import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
+import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 
 public class XSHandler {
 
+    private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
     private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
     private static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> playerCreatorTopics = new HashMap<>();
 
@@ -44,6 +47,14 @@ public class XSHandler {
         serverClient = server;
     }
 
+    public static HashMap<String, XSItemmails> getXsItemmailsHashMap() {
+        return xsItemmailsHashMap;
+    }
+
+    public static void setXsItemmailsHashMap(HashMap<String,XSItemmails> dataMap) {
+        xsItemmailsHashMap = dataMap;
+    }
+
     public static void initSystem() {
 
         //Setting up configuration
@@ -62,6 +73,14 @@ public class XSHandler {
         //load event
         new eventLoader();
 
+        //Req data
+        reqDataFromServer();
+
+    }
+
+    public static void reqDataFromServer() {
+        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.REQ_DATA_FROM_CLIENT+"<SPLIT>"
+        +XSHandler.getServerClient());
     }
 
 }

@@ -1,12 +1,20 @@
 package net.xsapi.panat.xsitemmailsclient.redis;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
+import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
+import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XSRedisHandler {
 
@@ -72,8 +80,27 @@ public class XSRedisHandler {
                         }
 
                         if(channel.startsWith(channelName)) {
-                            Bukkit.getConsoleSender().sendMessage("Recieved " + message + " From Server");
-                            sendRedisMessage(getRedisItemMailsServerChannel(),"test sent to server");
+
+                            core.getPlugin().getLogger().info(("Recieved " + message + " From Server"));
+
+                            XS_REDIS_MESSAGES xsRedisMessages = XS_REDIS_MESSAGES.valueOf(message.split("<SPLIT>")[0]);
+                            String args = message.split("<SPLIT>")[1];
+
+                            if (xsRedisMessages.equals(XS_REDIS_MESSAGES.CREATE_ITEM_RESPOND)) {
+                                String playerName = args.split(";")[0];
+                                if(Bukkit.getPlayer(playerName)!= null) {
+                                    Player sender = Bukkit.getPlayer(playerName);
+                                    XSUtils.sendMessageFromConfig("create_success",sender);
+                                }
+
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER)) {
+                                String dataJSON = args.split(";")[0];
+                                Gson gson = new Gson();
+                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+
+                                XSHandler.setXsItemmailsHashMap(dataList);
+
+                            }
                         }
 
                     }

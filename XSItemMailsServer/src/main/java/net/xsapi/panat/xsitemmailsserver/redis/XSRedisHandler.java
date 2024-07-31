@@ -1,10 +1,17 @@
 package net.xsapi.panat.xsitemmailsserver.redis;
 
+import com.google.gson.Gson;
 import net.xsapi.panat.xsitemmailsserver.config.mainConfig;
 import net.xsapi.panat.xsitemmailsserver.core;
+import net.xsapi.panat.xsitemmailsserver.database.XSDatabaseHandler;
+import net.xsapi.panat.xsitemmailsserver.handler.XSHandler;
+import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class XSRedisHandler {
@@ -21,7 +28,7 @@ public class XSRedisHandler {
         return redisItemMailsServerChannel;
     }
     public static String getRedisItemMailsClientChannel(String server) {
-        return redisItemMailsServerChannel+"_"+server;
+        return redisItemMailsClientChannel+"_"+server;
     }
 
     public static String getRedisHost() {
@@ -72,9 +79,35 @@ public class XSRedisHandler {
                         if(channel.startsWith(channelName)) {
 
                             XS_REDIS_MESSAGES xsRedisMessages = XS_REDIS_MESSAGES.valueOf(message.split("<SPLIT>")[0]);
-
+                            String args = message.split("<SPLIT>")[1];
                             if(xsRedisMessages.equals(XS_REDIS_MESSAGES.CREATE_ITEM)) {
 
+                                String itemName = args.split(";")[0];
+                                String serverClient = args.split(";")[1];
+                                String senderName = args.split(";")[2];
+                                String base64Items = args.split(";")[3];
+
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+
+                                try {
+                                    Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(),XSDatabaseHandler.getUSER(),XSDatabaseHandler.getPASS());
+                                    XSHandler.insertItemToSQL(connection,serverGroup,itemName,base64Items);
+                                    //core.getPlugin().getLogger().info("send to " + XSRedisHandler.getRedisItemMailsClientChannel(serverClient));
+                                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.CREATE_ITEM_RESPOND+"<SPLIT>"+senderName);
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                            } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.REQ_DATA_FROM_CLIENT)) {
+                                String serverClient = args.split(";")[0];
+
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+
+                                Gson gson = new Gson();
+                                String dataJSON = gson.toJson(XSHandler.getItemmailsList(serverGroup));
+
+                                XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER+"<SPLIT>"
+                                + dataJSON);
                             }
 
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));
