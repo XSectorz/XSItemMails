@@ -1,4 +1,7 @@
 
 prefix: "<color:#03BA00><bold>XSItemMails</bold></color:#03BA00> <dark_gray>▸ <reset>"
-input_name: "<white>กรุณากรอกชื่อไอเทมที่คุณต้องการ <click:run_command:/xsitemmails cancel create><hover:show_text:'<color:#03BA00>คลิกเพื่อดำเนินการ'><color:#03BA00>[คลิกเพื่อยกเลิก]</hover></click>"
-create_success: "<white>ทำการสร้างไอเทมเสร็จสิ้นสามารถตั้งค่าได้เลย "
+input_name: "<white>กรุณากรอกชื่อรางวัลที่คุณต้องการ <click:run_command:/xsitemmails cancel create><hover:show_text:'<color:#03BA00>คลิกเพื่อดำเนินการ'><color:#03BA00>[คลิกเพื่อยกเลิก]</hover></click>"
+create_success: "<white>ทำการสร้างรางวัลเสร็จสิ้นสามารถตั้งค่าได้เลย "
+create_fail: "<red>ไม่สามารถสร้างได้เนื่องจากชื่อรางวัลดังกล่าวมีอยู่แล้ว"
+cancel_create_success: "<white>ยกเลิกการสร้างรางวัลเรียบร้อยแล้ว"
+cancel_create_fail: "<white>คุณไม่ได้อยู่ในการสร้างรางวัลไม่สามารถยกเลิกใดๆได้"

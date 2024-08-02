@@ -7,7 +7,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
+import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
+import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -24,10 +26,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class XSUtils {
 
@@ -73,21 +72,23 @@ public class XSUtils {
         }
     }
 
-    public static Inventory createInventoryFromConfig(FileConfiguration file,Player p) {
+    public static Inventory createInventoryFromConfig(FileConfiguration file,Player p,XSItemmails xsItemmails) {
 
         String title = XSUtils.decodeText(file.getString("settings.title"));
         int size = file.getInt("settings.size");
+
+        XSHandler.getPlayerGUISection().put(p,new HashMap<>());
 
         Inventory inv = Bukkit.createInventory(null,size,title);
 
         XSHandler.getPlayerOpenInventory().put(p,inv);
         XSHandler.getPlayerPage().put(p,1);
-        updateInventoryContent(file,p);
+        updateInventoryContent(file,p,xsItemmails);
 
         return inv;
     }
 
-    public static void updateInventoryContent(FileConfiguration fileConfiguration, Player p) {
+    public static void updateInventoryContent(FileConfiguration fileConfiguration, Player p,XSItemmails xsItemmails) {
 
         Inventory inv = XSHandler.getPlayerOpenInventory().get(p);
         HashMap<Integer,String> guiSection = new HashMap<>();
@@ -96,6 +97,53 @@ public class XSUtils {
             int slot = fileConfiguration.getInt("settings.additional_contents." + content + ".slot");
             guiSection.put(slot,content);
             inv.setItem(slot,decodeItemFromConfig("settings.additional_contents." + content,fileConfiguration,p.getName()));
+        }
+
+        if(xsItemmails != null) {
+            int slot = fileConfiguration.getInt("settings.additional_info.preview_display_items");
+            guiSection.put(slot,"preview_display_items");
+            inv.setItem(slot,XSUtils.itemStackFromBase64(xsItemmails.getItemDisplay()));
+        }
+
+        if(fileConfiguration.get("settings.additional_info.items_generate") != null) {
+
+            int sizeSlot = fileConfiguration.getStringList("settings.additional_info.items_generate").size();
+            HashMap<String, XSItemmails> itemList = XSHandler.getXsItemmailsHashMap();
+            List<Map.Entry<String, XSItemmails>> entryList = new ArrayList<>(itemList.entrySet());
+
+            int startIndex = 0;
+            int endIndex = 0;
+
+            startIndex = (XSHandler.getPlayerPage().get(p)-1)*sizeSlot;
+            endIndex = Math.min(startIndex + sizeSlot-1, itemList.size());
+
+            if(endIndex+1 < itemList.size()) {
+                int slot = fileConfiguration.getInt("settings.additional_info.next_button");
+                guiSection.put(slot,"next_button");
+                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName()));
+            }
+            if(XSHandler.getPlayerPage().get(p) > 1) {
+                int slot = fileConfiguration.getInt("settings.additional_info.back_button");
+                guiSection.put(slot,"back_button");
+                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName()));
+            }
+
+            if(endIndex+1 < itemList.size()) {
+                entryList = entryList.subList(startIndex, endIndex+1);
+            } else {
+                entryList = entryList.subList(startIndex, endIndex);
+            }
+
+            List<String> stringList = fileConfiguration.getStringList("settings.additional_info.items_generate");
+            ArrayList<String> slotList = new ArrayList<>(stringList);
+
+            int index = 0;
+            for (Map.Entry<String, XSItemmails> entry : entryList) {
+                int slot = Integer.parseInt(slotList.get(index));
+                guiSection.put(slot,entry.getKey());
+                inv.setItem(slot,XSUtils.itemStackFromBase64(entry.getValue().getItemDisplay()));
+                index++;
+            }
         }
 
         XSHandler.getPlayerGUISection().put(p,guiSection);

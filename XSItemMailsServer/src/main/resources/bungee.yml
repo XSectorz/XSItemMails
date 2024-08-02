@@ -1,3 +1,4 @@
 name: XSItemMailsServer
 version: '${project.version}'
 main: net.xsapi.panat.xsitemmailsserver.core
+author: Panat XSectorZ

@@ -1,12 +1,16 @@
 package net.xsapi.panat.xsitemmailsclient.handler;
 
 import net.xsapi.panat.xsitemmailsclient.commands.commandLoader;
+import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.configLoader;
 import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
+import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.listener.eventLoader;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
+import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -17,6 +21,7 @@ public class XSHandler {
 
     private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
     private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
+    private static HashMap<Player, String> playerEditorKey = new HashMap<>();
     private static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> playerCreatorTopics = new HashMap<>();
 
     private static HashMap<Player,Integer> playerPage = new HashMap<>();
@@ -26,6 +31,9 @@ public class XSHandler {
 
     public static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> getPlayerCreatorTopics() {
         return playerCreatorTopics;
+    }
+    public static HashMap<Player, String> getPlayerEditorKey() {
+        return playerEditorKey;
     }
 
     public static HashMap<Player,HashMap<Integer,String>> getPlayerGUISection() {
@@ -76,6 +84,16 @@ public class XSHandler {
         //Req data
         reqDataFromServer();
 
+    }
+
+    public static void closeAllOpenInventory() {
+        for(Player p : Bukkit.getOnlinePlayers()) {
+            for(XS_MENU_FILE xsMenuFile : XS_MENU_FILE.values()) {
+                if(p.getOpenInventory().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(xsMenuFile).getString("settings.title")))) {
+                    p.closeInventory();
+                }
+            }
+        }
     }
 
     public static void reqDataFromServer() {

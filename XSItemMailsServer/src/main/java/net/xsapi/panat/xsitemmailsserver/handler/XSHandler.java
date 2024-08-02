@@ -52,6 +52,14 @@ public class XSHandler {
         sendDataToEachServer();
     }
 
+    public static void sendDataToSpecificServerGroup(String group) {
+        Gson gson = new Gson();
+        String dataJSON = gson.toJson(XSHandler.getItemmailsList(group));
+        for (String server :  mainConfig.getConfig().getStringList("group-servers." + group)) {
+            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(server), XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER+"<SPLIT>"+dataJSON);
+        }
+    }
+
     public static void sendDataToEachServer() {
         Gson gson = new Gson();
         for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {

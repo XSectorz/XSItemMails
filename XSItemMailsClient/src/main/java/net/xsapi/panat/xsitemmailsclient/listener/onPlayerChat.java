@@ -28,12 +28,16 @@ public class onPlayerChat implements Listener {
 
             if(topics.equals(XS_ITEMS_EDITOR_TOPICS.INPUT_NAME)) {
                 String itemNames = ChatColor.stripColor(message);
+                XSHandler.getPlayerCreatorTopics().remove(p);
+                if(XSHandler.getXsItemmailsHashMap().containsKey(itemNames)) {
+                    XSUtils.sendMessageFromConfig("create_fail",p);
+                    return;
+                }
 
                 String base64Items = XSUtils.itemStackToBase64(XSUtils.decodeItemFromConfig("settings.default_preview_items",mainConfig.getConfig(),p.getName()));
 
                 XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),
                         XS_REDIS_MESSAGES.CREATE_ITEM+"<SPLIT>" + itemNames + ";" + XSHandler.getServerClient() + ";" + p.getName() + ";" + base64Items);
-                XSHandler.getPlayerCreatorTopics().remove(p);
             }
 
 

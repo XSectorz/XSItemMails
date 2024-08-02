@@ -3,8 +3,12 @@ package net.xsapi.panat.xsitemmailsserver.database;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.xsapi.panat.xsitemmailsserver.config.mainConfig;
 import net.xsapi.panat.xsitemmailsserver.core;
+import net.xsapi.panat.xsitemmailsserver.handler.XSHandler;
+import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
 
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XSDatabaseHandler {
 
@@ -67,6 +71,37 @@ public class XSDatabaseHandler {
         }
         core.getPlugin().getLogger().info("******************************");
 
+    }
+
+    public static void saveDataToSQL() {
+        core.getPlugin().getLogger().info("******************************");
+        core.getPlugin().getLogger().info("XSItemmails trying to save data....");
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(),XSDatabaseHandler.getUSER(),XSDatabaseHandler.getPASS());
+            for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
+                for(Map.Entry<String, XSItemmails> itemmailsEntry : XSHandler.getItemmailsList(group).entrySet()) {
+                    updateItems(connection,group,itemmailsEntry.getValue());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        core.getPlugin().getLogger().info("Saved data complete!");
+        core.getPlugin().getLogger().info("******************************");
+    }
+
+    private static void updateItems(Connection connection,String group,XSItemmails xsItemmails) {
+        String updateQuery = "UPDATE " + ("xsitemmails_bungee_"+group+"_items") + " SET itemDisplay = ?, rewardItems = ?, rewardCommands = ? WHERE id = ?";
+
+        try (PreparedStatement preparedStatementInsert = connection.prepareStatement(updateQuery)) {
+            preparedStatementInsert.setString(1, xsItemmails.getItemDisplay());
+            preparedStatementInsert.setString(2, String.join(",",xsItemmails.getRewardItems()));
+            preparedStatementInsert.setString(3, String.join(",",xsItemmails.getRewardCommands()));
+            preparedStatementInsert.setInt(4, xsItemmails.getId());
+            preparedStatementInsert.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void createUserSQL(ProxiedPlayer p) {

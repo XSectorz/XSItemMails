@@ -108,6 +108,22 @@ public class XSRedisHandler {
 
                                 XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER+"<SPLIT>"
                                 + dataJSON);
+                            } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER)) {
+                                String idKey = args.split(";")[0];
+                                String itemKey = args.split(";")[1];
+                                String serverClient = args.split(";")[2];
+                                String updateCase = args.split(";")[3];
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+
+                                XSItemmails xsItemmails = XSHandler.getItemmailsList(serverGroup).get(idKey);
+
+                                if(updateCase.equalsIgnoreCase("preview")) {
+                                    xsItemmails.setItemDisplay(itemKey);
+                                }
+
+                                /*Update to all server*/
+                                XSHandler.sendDataToSpecificServerGroup(serverGroup);
+
                             }
 
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));
