@@ -119,6 +119,9 @@ public class XSRedisHandler {
 
                                 if(updateCase.equalsIgnoreCase("preview")) {
                                     xsItemmails.setItemDisplay(itemKey);
+                                    if(!XSHandler.getUpdatedKey().contains(idKey)) {
+                                        XSHandler.getUpdatedKey().add(idKey);
+                                    }
                                 }
 
                                 /*Update to all server*/

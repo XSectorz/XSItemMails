@@ -80,7 +80,10 @@ public class XSDatabaseHandler {
             Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(),XSDatabaseHandler.getUSER(),XSDatabaseHandler.getPASS());
             for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
                 for(Map.Entry<String, XSItemmails> itemmailsEntry : XSHandler.getItemmailsList(group).entrySet()) {
-                    updateItems(connection,group,itemmailsEntry.getValue());
+                    if(XSHandler.getUpdatedKey().contains(itemmailsEntry.getKey())) {
+                        updateItems(connection,group,itemmailsEntry.getValue());
+                        core.getPlugin().getLogger().info("Contain key : " + itemmailsEntry.getKey() + " updated!");
+                    }
                 }
             }
         } catch (SQLException e) {

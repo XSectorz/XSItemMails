@@ -17,10 +17,15 @@ import java.util.HashMap;
 public class XSHandler {
 
     private static HashMap<String,HashMap<String, XSItemmails>> itemmailsList = new HashMap<>();
+    private static ArrayList<String> updatedKey = new ArrayList<>();
 
     public static HashMap<String, XSItemmails> getItemmailsList(String server) {
 
         return itemmailsList.get(server);
+    }
+
+    public static ArrayList<String> getUpdatedKey() {
+        return updatedKey;
     }
 
     public static void initSystem() {
