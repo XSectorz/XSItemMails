@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -141,6 +142,16 @@ public class onInventory implements Listener {
                     } else if (key.equalsIgnoreCase("items_reward")) {
                         XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
                         p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS),p,xsItemmails));
+                    } else if(key.equalsIgnoreCase("commands_reward")) {
+                        if(e.getClick().equals(ClickType.LEFT)) {
+                            XSHandler.getPlayerCreatorTopics().put(p, XS_ITEMS_EDITOR_TOPICS.INPUT_COMMAND);
+                            p.closeInventory();
+                            XSUtils.sendMessageFromConfig("input_command",p);
+                        } else if(e.getClick().equals(ClickType.RIGHT)) {
+
+                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER+"<SPLIT>"+"remove_commands;"
+                                    +XSHandler.getServerClient()+";"+XSHandler.getPlayerEditorKey().get(p)+";"+p.getName());
+                        }
                     }
                 }
             }

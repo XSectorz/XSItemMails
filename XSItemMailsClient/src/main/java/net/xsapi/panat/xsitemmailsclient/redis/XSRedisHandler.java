@@ -2,7 +2,9 @@ package net.xsapi.panat.xsitemmailsclient.redis;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
+import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
@@ -86,11 +88,26 @@ public class XSRedisHandler {
                             XS_REDIS_MESSAGES xsRedisMessages = XS_REDIS_MESSAGES.valueOf(message.split("<SPLIT>")[0]);
                             String args = message.split("<SPLIT>")[1];
 
-                            if (xsRedisMessages.equals(XS_REDIS_MESSAGES.CREATE_ITEM_RESPOND)) {
-                                String playerName = args.split(";")[0];
-                                if(Bukkit.getPlayer(playerName)!= null) {
+                            if (xsRedisMessages.equals(XS_REDIS_MESSAGES.RETURN_CREATE)) {
+                                String dataJSON = args.split(";")[0];
+                                String playerName = args.split(";")[1];
+                                String serverClient = args.split(";")[2];
+                                String itemName = args.split(";")[3];
+
+                                Gson gson = new Gson();
+                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+
+                                XSHandler.setXsItemmailsHashMap(dataList);
+
+                                if(XSHandler.getServerClient().equalsIgnoreCase(serverClient) && Bukkit.getPlayer(playerName)!= null) {
                                     Player sender = Bukkit.getPlayer(playerName);
                                     XSUtils.sendMessageFromConfig("create_success",sender);
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            sender.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),sender,XSHandler.getXsItemmailsHashMap().get(itemName)));
+                                        }
+                                    }, 1L);
                                 }
 
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER)) {
@@ -100,6 +117,50 @@ public class XSRedisHandler {
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.RETURN_ADD_COMMAND)) {
+                                String dataJSON = args.split(";")[0];
+                                String playerName = args.split(";")[1];
+                                String serverClient = args.split(";")[2];
+                                Gson gson = new Gson();
+                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+
+                                XSHandler.setXsItemmailsHashMap(dataList);
+
+                                if(XSHandler.getServerClient().equalsIgnoreCase(serverClient) && Bukkit.getPlayer(playerName) != null) {
+                                    Player p = Bukkit.getPlayer(playerName);
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p))));
+                                        }
+                                    }, 1L);
+                                }
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.RETURN_REMOVE_COMMAND)) {
+                                String dataJSON = args.split(";")[0];
+                                String status = args.split(";")[1];
+                                String playerName = args.split(";")[2];
+                                String serverClient = args.split(";")[3];
+                                String idKey = args.split(";")[4];
+                                Gson gson = new Gson();
+                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+
+                                XSHandler.setXsItemmailsHashMap(dataList);
+
+                                if(XSHandler.getServerClient().equalsIgnoreCase(serverClient) && Bukkit.getPlayer(playerName) != null) {
+                                    Player p = Bukkit.getPlayer(playerName);
+                                    if(status.equalsIgnoreCase("fail")) {
+                                        XSUtils.sendMessageFromConfig("remove_fail",p);
+                                    } else {
+                                        XSUtils.sendMessageFromConfig("remove_success",p);
+                                    }
+
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,XSHandler.getXsItemmailsHashMap().get(idKey)));
+                                        }
+                                    }, 1L);
+                                }
                             }
                         }
 

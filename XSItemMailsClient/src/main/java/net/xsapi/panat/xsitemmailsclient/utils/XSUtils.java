@@ -194,7 +194,17 @@ public class XSUtils {
         ArrayList<String> lores = new ArrayList<>();
 
         for(String lore : conf.getStringList(path+".lore")) {
-            lores.add(XSUtils.decodeText(decodeItemPlaceholder(lore,xsItemmails)));
+
+            if(lore.equalsIgnoreCase("%commands_lists%")) {
+
+                ArrayList<String> tempCommands = (ArrayList<String>) xsItemmails.getRewardCommands().clone();
+                tempCommands.replaceAll(item -> XSUtils.decodeText("<gray>"+item));
+
+                lores.addAll(tempCommands);
+
+            } else {
+                lores.add(XSUtils.decodeText(decodeItemPlaceholder(lore,xsItemmails)));
+            }
         }
 
         ItemStack it;

@@ -95,7 +95,8 @@ public class XSRedisHandler {
                                     Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(),XSDatabaseHandler.getUSER(),XSDatabaseHandler.getPASS());
                                     XSHandler.insertItemToSQL(connection,serverGroup,itemName,base64Items);
                                     //core.getPlugin().getLogger().info("send to " + XSRedisHandler.getRedisItemMailsClientChannel(serverClient));
-                                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.CREATE_ITEM_RESPOND+"<SPLIT>"+senderName);
+
+                                    XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.RETURN_CREATE,serverGroup,senderName+";"+serverClient+";"+itemName);
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -121,18 +122,35 @@ public class XSRedisHandler {
                                 if(updateCase.equalsIgnoreCase("preview")) {
                                     String itemKey = args.split(";")[3];
                                     xsItemmails.setItemDisplay(itemKey);
+                                    XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER,serverGroup,"");
                                 } else if(updateCase.equalsIgnoreCase("item_rewards")) {
                                     String dataJSON = args.split(";")[3];
                                     Gson gson = new Gson();
                                     ArrayList<String> dataList = gson.fromJson(dataJSON, new TypeToken<ArrayList<String>>(){}.getType());
                                     xsItemmails.setRewardItems(dataList);
+                                    XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER,serverGroup,"");
+                                } else if(updateCase.equalsIgnoreCase("add_commands")) {
+                                    String data = args.split(";")[3];
+                                    String playerName = args.split(";")[4];
+
+                                    xsItemmails.getRewardCommands().add(data);
+                                    XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.RETURN_ADD_COMMAND,serverGroup,playerName+";"+serverClient);
+                                } else if(updateCase.equalsIgnoreCase("remove_commands")) {
+                                    String playerName = args.split(";")[3];
+                                    String status;
+                                    if(xsItemmails.getRewardCommands().isEmpty()) {
+                                        status = "fail";
+                                    } else {
+                                        status = "success";
+                                        xsItemmails.getRewardCommands().remove(xsItemmails.getRewardCommands().size()-1);
+                                    }
+
+                                    XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.RETURN_REMOVE_COMMAND,serverGroup,status+";"+playerName+";"+serverClient+";"+idKey);
+
                                 }
                                 if(!XSHandler.getUpdatedKey().contains(idKey)) {
                                     XSHandler.getUpdatedKey().add(idKey);
                                 }
-
-                                /*Update to all server*/
-                                XSHandler.sendDataToSpecificServerGroup(serverGroup);
 
                             }
 
