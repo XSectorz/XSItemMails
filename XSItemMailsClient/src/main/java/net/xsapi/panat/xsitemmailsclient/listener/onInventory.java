@@ -1,5 +1,6 @@
 package net.xsapi.panat.xsitemmailsclient.listener;
 
+import com.google.gson.Gson;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
@@ -10,14 +11,67 @@ import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+
 public class onInventory implements Listener {
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent e) {
+        Player p = (Player) e.getPlayer();
+
+        if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS).getString("settings.title")))) {
+
+            Inventory inv = e.getInventory();
+
+            XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
+            ArrayList<String> itemRewardsList = xsItemmails.getRewardItems();
+            ArrayList<String> tempRewardList = new ArrayList<>();
+            int size = itemRewardsList.size();
+
+            for(String slotStr : menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS).getStringList("settings.additional_info.items_slot")) {
+
+                int slot = Integer.parseInt(slotStr);
+
+                ItemStack it = inv.getItem(slot);
+
+                if(it != null && !it.getType().equals(Material.AIR))  {
+                    //Bukkit.broadcastMessage(inv.getItem(slot).getType().toString());
+                    tempRewardList.add(XSUtils.itemStackToBase64(it));
+
+                }
+
+            }
+
+            for(String dataItem : tempRewardList) {
+                if(itemRewardsList.contains(dataItem)) {
+                    size--;
+                }
+            }
+
+            if(size != 0 || xsItemmails.getRewardItems().isEmpty()) { //something change!
+                xsItemmails.setRewardItems(tempRewardList);
+
+                Gson gson = new Gson();
+                String dataJSON = gson.toJson(tempRewardList);
+                //send to server to update
+                XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER+"<SPLIT>"+"item_rewards;"
+                        +XSHandler.getServerClient()+";"+XSHandler.getPlayerEditorKey().get(p)+";"+dataJSON);
+            }
+
+        }
+
+    }
+
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
@@ -60,12 +114,10 @@ public class onInventory implements Listener {
         } else if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE).getString("settings.title")))) {
             int slot = e.getSlot();
             if(e.getClickedInventory().equals(e.getView().getBottomInventory())) {
-                p.sendMessage("Bottom Inv");
             } else {
                 e.setCancelled(true);
 
                 if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
-                    p.sendMessage("Top Inv");
                     String key = XSHandler.getPlayerGUISection().get(p).get(slot);
                     p.sendMessage(key);
                     if (key.equalsIgnoreCase("back_to_main_menu")) {
@@ -74,18 +126,36 @@ public class onInventory implements Listener {
                     } else if (key.equalsIgnoreCase("preview_display_items")) {
                         ItemStack it = e.getCursor();
 
-                        if(it != null) {
+                        if(it != null && !it.getType().equals(Material.AIR)) {
                             p.sendMessage(it.getType().toString());
                             String itBase64 = XSUtils.itemStackToBase64(it);
 
                             XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
                             xsItemmails.setItemDisplay(itBase64);
 
-                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER+"<SPLIT>"+XSHandler.getPlayerEditorKey().get(p)
-                            +";"+itBase64+";"+XSHandler.getServerClient()+";preview");
+                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER+"<SPLIT>"+"preview;"
+                                    +XSHandler.getServerClient()+";"+XSHandler.getPlayerEditorKey().get(p)+";"+itBase64);
                             XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,xsItemmails);
                             e.setCursor(new ItemStack(Material.AIR));
                         }
+                    } else if (key.equalsIgnoreCase("items_reward")) {
+                        XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
+                        p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS),p,xsItemmails));
+                    }
+                }
+            }
+        } else if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS).getString("settings.title")))) {
+            int slot = e.getSlot();
+            if(e.getClickedInventory().equals(e.getView().getBottomInventory())) {
+
+            } else {
+                e.setCancelled(true);
+                if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
+                    String key = XSHandler.getPlayerGUISection().get(p).get(slot);
+
+                    if (key.equalsIgnoreCase("back_to_reward_editor_menu")) {
+                        XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
+                        p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,xsItemmails));
                     }
                 }
             }

@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
@@ -99,11 +100,26 @@ public class XSUtils {
             inv.setItem(slot,decodeItemFromConfig("settings.additional_contents." + content,fileConfiguration,p.getName()));
         }
 
-        if(xsItemmails != null) {
-            int slot = fileConfiguration.getInt("settings.additional_info.preview_display_items");
-            guiSection.put(slot,"preview_display_items");
-            inv.setItem(slot,XSUtils.itemStackFromBase64(xsItemmails.getItemDisplay()));
+        if(fileConfiguration.get("settings.additional_info.items_slot") != null) {
+
+            List<String> slotList = fileConfiguration.getStringList("settings.additional_info.items_slot");
+            int index = 0;
+
+            Bukkit.broadcastMessage("Item List " + xsItemmails.getRewardItems().size());
+            for(String reward : xsItemmails.getRewardItems()) {
+                ItemStack it = XSUtils.itemStackFromBase64(reward);
+                inv.setItem(Integer.parseInt(slotList.get(index)),it);
+                index++;
+
+            }
+        } else {
+            if(xsItemmails != null) {
+                int slot = fileConfiguration.getInt("settings.additional_info.preview_display_items");
+                guiSection.put(slot,"preview_display_items");
+                inv.setItem(slot,XSUtils.itemStackFromBase64(xsItemmails.getItemDisplay()));
+            }
         }
+
 
         if(fileConfiguration.get("settings.additional_info.items_generate") != null) {
 

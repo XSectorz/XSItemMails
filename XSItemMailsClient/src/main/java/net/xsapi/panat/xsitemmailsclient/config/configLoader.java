@@ -7,6 +7,7 @@ public class configLoader {
         new messagesConfig().loadConfigu();
         new menuConfig().loadConfigu(XS_MENU_FILE.XS_MAIN_MENU);
         new menuConfig().loadConfigu(XS_MENU_FILE.XS_ITEM_CREATE);
+        new menuConfig().loadConfigu(XS_MENU_FILE.XS_REWARD_ITEMS);
     }
 
 }

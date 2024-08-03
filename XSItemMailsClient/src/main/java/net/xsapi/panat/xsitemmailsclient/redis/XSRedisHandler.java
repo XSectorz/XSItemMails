@@ -81,7 +81,7 @@ public class XSRedisHandler {
 
                         if(channel.startsWith(channelName)) {
 
-                            core.getPlugin().getLogger().info(("Recieved " + message + " From Server"));
+                            //core.getPlugin().getLogger().info(("Recieved " + message + " From Server"));
 
                             XS_REDIS_MESSAGES xsRedisMessages = XS_REDIS_MESSAGES.valueOf(message.split("<SPLIT>")[0]);
                             String args = message.split("<SPLIT>")[1];

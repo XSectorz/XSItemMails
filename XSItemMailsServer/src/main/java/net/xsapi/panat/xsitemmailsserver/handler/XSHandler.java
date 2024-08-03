@@ -3,6 +3,7 @@ package net.xsapi.panat.xsitemmailsserver.handler;
 import com.google.gson.Gson;
 import net.xsapi.panat.xsitemmailsserver.config.configLoader;
 import net.xsapi.panat.xsitemmailsserver.config.mainConfig;
+import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.database.XSDatabaseHandler;
 import net.xsapi.panat.xsitemmailsserver.listeners.eventLoader;
 import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
@@ -104,8 +105,19 @@ public class XSHandler {
                 String rewardItems = resultSet.getString("rewardItems");
                 String rewardCommands = resultSet.getString("rewardCommands");
 
-                ArrayList<String> rewardsItemsList = new ArrayList<>(Arrays.asList(rewardItems.split(",")));
-                ArrayList<String> rewardsCommandsList = new ArrayList<>(Arrays.asList(rewardCommands.split(",")));
+                ArrayList<String> rewardsItemsList;
+                if (rewardItems.trim().isEmpty()) {
+                    rewardsItemsList = new ArrayList<>();
+                } else {
+                    rewardsItemsList = new ArrayList<>(Arrays.asList(rewardItems.split(",")));
+                }
+
+                ArrayList<String> rewardsCommandsList;
+                if (rewardCommands.trim().isEmpty()) {
+                    rewardsCommandsList = new ArrayList<>();
+                } else {
+                    rewardsCommandsList = new ArrayList<>(Arrays.asList(rewardCommands.split(",")));
+                }
 
                 XSItemmails xsItemmails = new XSItemmails(id,itemName,itemDisplay,rewardsItemsList,rewardsCommandsList);
                 itemsList.put(itemName,xsItemmails);

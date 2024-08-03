@@ -1,6 +1,7 @@
 package net.xsapi.panat.xsitemmailsserver.redis;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.xsapi.panat.xsitemmailsserver.config.mainConfig;
 import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.database.XSDatabaseHandler;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class XSRedisHandler {
 
@@ -109,19 +111,24 @@ public class XSRedisHandler {
                                 XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER+"<SPLIT>"
                                 + dataJSON);
                             } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.UPDATE_DATA_TO_SERVER)) {
-                                String idKey = args.split(";")[0];
-                                String itemKey = args.split(";")[1];
-                                String serverClient = args.split(";")[2];
-                                String updateCase = args.split(";")[3];
+                                String updateCase = args.split(";")[0];
+                                String serverClient = args.split(";")[1];
+                                String idKey = args.split(";")[2];
                                 String serverGroup = XSHandler.getServergroup(serverClient);
 
                                 XSItemmails xsItemmails = XSHandler.getItemmailsList(serverGroup).get(idKey);
 
                                 if(updateCase.equalsIgnoreCase("preview")) {
+                                    String itemKey = args.split(";")[3];
                                     xsItemmails.setItemDisplay(itemKey);
-                                    if(!XSHandler.getUpdatedKey().contains(idKey)) {
-                                        XSHandler.getUpdatedKey().add(idKey);
-                                    }
+                                } else if(updateCase.equalsIgnoreCase("item_rewards")) {
+                                    String dataJSON = args.split(";")[3];
+                                    Gson gson = new Gson();
+                                    ArrayList<String> dataList = gson.fromJson(dataJSON, new TypeToken<ArrayList<String>>(){}.getType());
+                                    xsItemmails.setRewardItems(dataList);
+                                }
+                                if(!XSHandler.getUpdatedKey().contains(idKey)) {
+                                    XSHandler.getUpdatedKey().add(idKey);
                                 }
 
                                 /*Update to all server*/
