@@ -149,7 +149,10 @@ public class onInventory implements Listener {
             if(e.getClickedInventory().equals(e.getView().getBottomInventory())) {
 
             } else {
-                e.setCancelled(true);
+
+                if(!menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS).getStringList("settings.additional_info.items_slot").contains(String.valueOf(e.getSlot()))) {
+                    e.setCancelled(true);
+                }
                 if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
                     String key = XSHandler.getPlayerGUISection().get(p).get(slot);
 
