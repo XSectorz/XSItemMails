@@ -97,7 +97,7 @@ public class XSUtils {
         for(String content : fileConfiguration.getConfigurationSection("settings.additional_contents").getKeys(false)) {
             int slot = fileConfiguration.getInt("settings.additional_contents." + content + ".slot");
             guiSection.put(slot,content);
-            inv.setItem(slot,decodeItemFromConfig("settings.additional_contents." + content,fileConfiguration,p.getName()));
+            inv.setItem(slot,decodeItemFromConfig("settings.additional_contents." + content,fileConfiguration,p.getName(),xsItemmails));
         }
 
         if(fileConfiguration.get("settings.additional_info.items_slot") != null) {
@@ -105,7 +105,6 @@ public class XSUtils {
             List<String> slotList = fileConfiguration.getStringList("settings.additional_info.items_slot");
             int index = 0;
 
-            Bukkit.broadcastMessage("Item List " + xsItemmails.getRewardItems().size());
             for(String reward : xsItemmails.getRewardItems()) {
                 ItemStack it = XSUtils.itemStackFromBase64(reward);
                 inv.setItem(Integer.parseInt(slotList.get(index)),it);
@@ -136,12 +135,12 @@ public class XSUtils {
             if(endIndex+1 < itemList.size()) {
                 int slot = fileConfiguration.getInt("settings.additional_info.next_button");
                 guiSection.put(slot,"next_button");
-                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName()));
+                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
             }
             if(XSHandler.getPlayerPage().get(p) > 1) {
                 int slot = fileConfiguration.getInt("settings.additional_info.back_button");
                 guiSection.put(slot,"back_button");
-                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName()));
+                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
             }
 
             if(endIndex+1 < itemList.size()) {
@@ -168,7 +167,20 @@ public class XSUtils {
 
     }
 
-    public static ItemStack decodeItemFromConfig(String path, Configuration conf, String player) {
+    public static String decodeItemPlaceholder(String lore,XSItemmails xsItemmails) {
+
+        if(xsItemmails != null) {
+
+            lore = lore.replace("%items_reward_amount%",String.valueOf(xsItemmails.getRewardItems().size()));
+            lore = lore.replace("%commands_reward_amount%",String.valueOf(xsItemmails.getRewardCommands().size()));
+
+        }
+
+        return lore;
+
+    }
+
+    public static ItemStack decodeItemFromConfig(String path, Configuration conf, String player,XSItemmails xsItemmails) {
 
         String display = XSUtils.decodeText(conf.getString(path+".display"));
         Material mat;
@@ -182,7 +194,7 @@ public class XSUtils {
         ArrayList<String> lores = new ArrayList<>();
 
         for(String lore : conf.getStringList(path+".lore")) {
-            lores.add(XSUtils.decodeText(lore));
+            lores.add(XSUtils.decodeText(decodeItemPlaceholder(lore,xsItemmails)));
         }
 
         ItemStack it;
