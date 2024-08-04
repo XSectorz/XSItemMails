@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
+import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
@@ -152,11 +153,33 @@ public class XSUtils {
             List<String> stringList = fileConfiguration.getStringList("settings.additional_info.items_generate");
             ArrayList<String> slotList = new ArrayList<>(stringList);
 
+            ArrayList<String> arrayList = new ArrayList();
+            for(String lore : mainConfig.getConfig().getStringList("settings.rewards_lore")) {
+                arrayList.add(XSUtils.decodeText(lore));
+            }
+
             int index = 0;
             for (Map.Entry<String, XSItemmails> entry : entryList) {
                 int slot = Integer.parseInt(slotList.get(index));
                 guiSection.put(slot,entry.getKey());
-                inv.setItem(slot,XSUtils.itemStackFromBase64(entry.getValue().getItemDisplay()));
+
+                ItemStack itWithAddLore = XSUtils.itemStackFromBase64(entry.getValue().getItemDisplay()).clone();
+
+                ItemMeta itemMeta = itWithAddLore.getItemMeta();
+
+                if(itemMeta.getLore() != null) {
+                    ArrayList<String> loreTemp = new ArrayList<>();
+
+                    loreTemp.addAll(itemMeta.getLore());
+                    loreTemp.addAll(arrayList);
+                    itemMeta.setLore(loreTemp);
+                } else {
+                    itemMeta.setLore(arrayList);
+                }
+
+                itWithAddLore.setItemMeta(itemMeta);
+
+                inv.setItem(slot,itWithAddLore);
                 index++;
             }
         }

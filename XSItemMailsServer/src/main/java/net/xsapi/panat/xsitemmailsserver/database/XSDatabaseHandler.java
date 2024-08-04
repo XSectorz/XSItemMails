@@ -107,6 +107,25 @@ public class XSDatabaseHandler {
         }
     }
 
+    public static void removeFromDatabase(String group,int id,String key) {
+
+        String removeItems = "DELETE FROM xsitemmails_bungee_" + group + "_items WHERE id = ?";
+
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(),XSDatabaseHandler.getUSER(),XSDatabaseHandler.getPASS());
+            PreparedStatement preparedStatement = connection.prepareStatement(removeItems);
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+
+            XSHandler.getItemmailsList(group).remove(key);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void createUserSQL(ProxiedPlayer p) {
 
         try {

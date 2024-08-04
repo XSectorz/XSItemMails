@@ -152,6 +152,16 @@ public class XSRedisHandler {
                                     XSHandler.getUpdatedKey().add(idKey);
                                 }
 
+                            }  else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.DELETE_ITEM_TO_SERVER)) {
+                                int id = Integer.parseInt(args.split(";")[0]);
+                                String key = args.split(";")[1];
+                                String serverClient = args.split(";")[2];
+                                String playerName = args.split(";")[3];
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+                                XSDatabaseHandler.removeFromDatabase(serverGroup,id,key);
+
+                                XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.DELETE_ITEM_TO_CLIENT,serverGroup,playerName+";"+serverClient);
+
                             }
 
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));

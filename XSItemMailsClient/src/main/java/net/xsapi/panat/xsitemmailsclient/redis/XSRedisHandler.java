@@ -161,6 +161,25 @@ public class XSRedisHandler {
                                         }
                                     }, 1L);
                                 }
+                            }  else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.DELETE_ITEM_TO_CLIENT)) {
+
+                                String dataJSON = args.split(";")[0];
+                                String playerName = args.split(";")[1];
+                                String serverClient = args.split(";")[2];
+                                Gson gson = new Gson();
+                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+
+                                XSHandler.setXsItemmailsHashMap(dataList);
+
+                                if(XSHandler.getServerClient().equalsIgnoreCase(serverClient) && Bukkit.getPlayer(playerName) != null) {
+                                    Player p = Bukkit.getPlayer(playerName);
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU),p,null));
+                                        }
+                                    }, 1L);
+                                }
                             }
                         }
 

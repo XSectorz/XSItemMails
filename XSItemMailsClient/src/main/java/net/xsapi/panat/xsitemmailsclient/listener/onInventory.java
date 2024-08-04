@@ -103,9 +103,16 @@ public class onInventory implements Listener {
                     XSUtils.sendMessageFromConfig("input_name",p);
                 } else {
                     if(XSHandler.getXsItemmailsHashMap().containsKey(key)) {
-                        XSHandler.getPlayerEditorKey().put(p,key);
-                        XSHandler.getPlayerPage().put(p,1);
-                        p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,XSHandler.getXsItemmailsHashMap().get(key)));
+
+                        if(e.getClick().equals(ClickType.LEFT)) {
+                            XSHandler.getPlayerEditorKey().put(p,key);
+                            XSHandler.getPlayerPage().put(p,1);
+                            p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),p,XSHandler.getXsItemmailsHashMap().get(key)));
+                        } else if(e.getClick().equals(ClickType.DROP)) {
+
+                            XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(key);
+                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.DELETE_ITEM_TO_SERVER+"<SPLIT>"+xsItemmails.getId()+";"+key+";"+XSHandler.getServerClient()+";"+p.getName());
+                        }
                     }
                 }
 
