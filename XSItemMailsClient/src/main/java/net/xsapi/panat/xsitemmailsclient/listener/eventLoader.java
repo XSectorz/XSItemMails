@@ -9,6 +9,7 @@ public class eventLoader {
 
         Bukkit.getPluginManager().registerEvents(new onInventory(), core.getPlugin());
         Bukkit.getPluginManager().registerEvents(new onPlayerChat(), core.getPlugin());
+        Bukkit.getPluginManager().registerEvents(new onPlayerJoin(), core.getPlugin());
 
     }
 

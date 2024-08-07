@@ -6,6 +6,8 @@ import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsserver.objects.XSRewards;
+import net.xsapi.panat.xsitemmailsserver.redis.XSRedisHandler;
+import net.xsapi.panat.xsitemmailsserver.redis.XS_REDIS_MESSAGES;
 
 import java.sql.*;
 import java.util.*;
@@ -73,6 +75,32 @@ public class XSDatabaseHandler {
 
     }
 
+    public static void loadPlaterDataReference() {
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
+            Statement statement = connection.createStatement();
+
+            String selectQuery = "SELECT * FROM xsitemmails_bungee_players";
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+
+            while (resultSet.next()) {
+                int reference =  resultSet.getInt("id");
+                String playerName =  resultSet.getString("playerName");
+
+                XSHandler.getPlayerDataReference().put(playerName,reference);
+
+            }
+
+            core.getPlugin().getLogger().info("LOAD DATA " + XSHandler.getPlayerDataReference().size());
+
+            statement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void loadPlayerReward(String serverGroup) {
         try {
             Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
@@ -103,6 +131,8 @@ public class XSDatabaseHandler {
             }
 
             XSHandler.getPlayerRewardData().put(serverGroup,arrayData);
+            statement.close();
+            connection.close();
 
 
         } catch (SQLException e) {
@@ -269,10 +299,23 @@ public class XSDatabaseHandler {
                     String insertQuery = "INSERT INTO " + getGlobalPlayerTable() + " (UUID, playerName) "
                             + "VALUES (?, ?)";
 
-                    try (PreparedStatement preparedStatementInsert = connection.prepareStatement(insertQuery)) {
+                    try (PreparedStatement preparedStatementInsert = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                         preparedStatementInsert.setString(1, String.valueOf(p.getUniqueId()));
                         preparedStatementInsert.setString(2, p.getName());
                         preparedStatementInsert.executeUpdate();
+
+                        try (ResultSet generatedKeys = preparedStatementInsert.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int id = generatedKeys.getInt(1);
+
+                                XSHandler.getPlayerDataReference().put(p.getName(),id);
+                                for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
+                                    for(String subServer : mainConfig.getConfig().getStringList("group-servers." + group)) {
+                                        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(subServer), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT_SPECIFIC+"<SPLIT>"+p.getName()+";"+id);
+                                    }
+                                }
+                            }
+                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }

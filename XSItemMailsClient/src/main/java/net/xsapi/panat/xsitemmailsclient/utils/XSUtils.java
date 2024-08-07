@@ -126,6 +126,14 @@ public class XSUtils {
             }
         }
 
+        if(fileConfiguration.get("settings.additional_info.rewards_slot") != null) {
+
+            if(XSHandler.getXsRewardsHashMap().containsKey(0)) {
+
+            }
+
+        }
+
         if(fileConfiguration.get("settings.additional_info.items_generate") != null) {
 
             int sizeSlot = fileConfiguration.getStringList("settings.additional_info.items_generate").size();

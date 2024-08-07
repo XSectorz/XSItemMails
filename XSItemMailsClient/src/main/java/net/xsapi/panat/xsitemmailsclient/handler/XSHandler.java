@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 public class XSHandler {
 
+    private static HashMap<String, Integer> playerDataReference = new HashMap<>();
     private static HashMap<Integer, ArrayList<XSRewards>> xsRewardsHashMap = new HashMap<>();
     private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
     private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
@@ -33,6 +34,8 @@ public class XSHandler {
     private static String serverClient;
 
     public static HashMap<Integer,ArrayList<XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
+
+    public static HashMap<String,Integer> getPlayerDataReference() { return playerDataReference; }
 
     public static void setXsRewardsHashMap(HashMap<Integer, ArrayList<XSRewards>> map) {
         xsRewardsHashMap = map;
@@ -93,7 +96,16 @@ public class XSHandler {
         //Req data
         reqDataFromServer();
         sendRequestPlayerReward();
+        sendRequestPlayerReference();
 
+    }
+
+    public static void setPlayerDataReference(HashMap<String,Integer> data) {
+        playerDataReference = data;
+    }
+
+    public static void sendRequestPlayerReference() {
+        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.REQUEST_PLAYER_DATA_TO_SERVER+"<SPLIT>"+XSHandler.getServerClient());
     }
 
     public static void sendRequestPlayerReward() {

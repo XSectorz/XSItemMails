@@ -190,6 +190,26 @@ public class XSRedisHandler {
 
                                 XSHandler.setXsRewardsHashMap(dataList);
 
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT_SPECIFIC)) {
+
+                                String playerName = args.split(";")[0];
+                                int idRef = Integer.parseInt(args.split(";")[1]);
+
+                                XSHandler.getPlayerDataReference().put(playerName,idRef);
+                                Bukkit.broadcastMessage("PLAYER " + playerName + " join with ref " + idRef);
+
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT)) {
+                                String dataJSON = args.split(";")[0];
+
+                                Gson gson = new Gson();
+                                HashMap<String, Integer> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, Integer>>(){}.getType());
+
+                                for(Map.Entry<String,Integer> data : dataList.entrySet()) {
+                                    Bukkit.broadcastMessage("Player " + data.getKey() + " with id " + data.getValue());
+                                }
+
+                                XSHandler.setPlayerDataReference(dataList);
+
                             }
                         }
 

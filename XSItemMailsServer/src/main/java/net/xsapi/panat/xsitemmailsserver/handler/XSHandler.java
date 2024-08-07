@@ -19,9 +19,14 @@ import java.util.HashMap;
 public class XSHandler {
 
     //<server>:<p_id>:<data>
+    private static HashMap<String,Integer> playerDataReference = new HashMap<>();
     private static HashMap<String,HashMap<Integer,ArrayList<XSRewards>>> playerRewardData = new HashMap<>();
     private static HashMap<String,HashMap<String, XSItemmails>> itemmailsList = new HashMap<>();
     private static ArrayList<String> updatedKey = new ArrayList<>();
+
+    public static HashMap<String,Integer> getPlayerDataReference() {
+        return playerDataReference;
+    }
 
     public static HashMap<String, HashMap<Integer, ArrayList<XSRewards>>> getPlayerRewardData() {
         return playerRewardData;
@@ -51,15 +56,40 @@ public class XSHandler {
         XSRedisHandler.redisConnection(); //test connection
         XSRedisHandler.subscribeToChannelAsync(XSRedisHandler.getRedisItemMailsServerChannel());
 
+        //load player data reference
+        XSDatabaseHandler.loadPlaterDataReference();
+        sendPlayerDataReferenceToAllServer();
+
         //Load data from database
         loadDataEachServer();
 
         //Sent data to each server
         sendPlayerRewardToAllServer();
 
-
-
     }
+
+    public static void sendPlayerDataReferenceToAllServer() {
+        for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
+            sendPlayerDataReferenceToSubServer(group);
+        }
+    }
+
+    public static void sendPlayerDataReferenceToSpecificSubServer(String serverClient) {
+        Gson gson = new Gson();
+        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference());
+        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT+"<SPLIT>"+dataJSON);
+    }
+
+    public static void sendPlayerDataReferenceToSubServer(String serverGroup) {
+
+        Gson gson = new Gson();
+        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference());
+
+        for(String group : mainConfig.getConfig().getStringList("group-servers."+serverGroup)) {
+            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(group), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT+"<SPLIT>"+dataJSON);
+        }
+    }
+
 
     public static void sendPlayerRewardToAllServer() {
         for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
@@ -165,6 +195,9 @@ public class XSHandler {
             }
 
             itemmailsList.put(server,itemsList);
+
+            core.getPlugin().getLogger().info("SERVER: " + server);
+            core.getPlugin().getLogger().info("RewardSize: " + itemmailsList.get(server).size());
 
             resultSet.close();
             preparedStatement.close();
