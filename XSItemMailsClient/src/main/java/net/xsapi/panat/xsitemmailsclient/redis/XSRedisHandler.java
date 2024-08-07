@@ -186,7 +186,7 @@ public class XSRedisHandler {
                                 String dataJSON = args.split(";")[0];
 
                                 Gson gson = new Gson();
-                                HashMap<Integer, ArrayList<XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer, ArrayList<XSRewards>>>(){}.getType());
+                                HashMap<Integer, HashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer,  HashMap<String,XSRewards>>>(){}.getType());
 
                                 XSHandler.setXsRewardsHashMap(dataList);
 
@@ -196,7 +196,7 @@ public class XSRedisHandler {
                                 int idRef = Integer.parseInt(args.split(";")[1]);
 
                                 XSHandler.getPlayerDataReference().put(playerName,idRef);
-                                Bukkit.broadcastMessage("PLAYER " + playerName + " join with ref " + idRef);
+                                //Bukkit.broadcastMessage("PLAYER " + playerName + " join with ref " + idRef);
 
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT)) {
                                 String dataJSON = args.split(";")[0];

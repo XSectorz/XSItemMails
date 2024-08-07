@@ -15,7 +15,7 @@ public class onPlayerJoin implements Listener {
     public void onPlayerJoinServer(PlayerJoinEvent e) {
 
         if(!XSHandler.getPlayerDataReference().containsKey(e.getPlayer().getName())) {
-            core.getPlugin().getLogger().info("SENT " + e.getPlayer().getName());
+            //core.getPlugin().getLogger().info("SENT " + e.getPlayer().getName());
             //XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.REQUEST_PLAYER_DATA_TO_SERVER_SPECIFIC+"<SPLIT>"+XSHandler.getServerClient()+";"+e.getPlayer());
         }
 

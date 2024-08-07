@@ -12,6 +12,7 @@ import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -128,8 +129,97 @@ public class XSUtils {
 
         if(fileConfiguration.get("settings.additional_info.rewards_slot") != null) {
 
-            if(XSHandler.getXsRewardsHashMap().containsKey(0)) {
+            if(XSHandler.getXsRewardsHashMap().containsKey(XSHandler.getPlayerDataReference().get(p.getName()))) {
 
+                int sizeSlot = fileConfiguration.getStringList("settings.additional_info.rewards_slot").size();
+
+                Bukkit.broadcastMessage("HAVE REWARD KEY : " + XSHandler.getPlayerDataReference().get(p.getName()));
+                Bukkit.broadcastMessage("REWARD SIZE : " + XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName())).size());
+
+                HashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName()));
+                HashMap<String,XSRewards> tempXSReward = new HashMap<>();
+
+                for(Map.Entry<String,XSRewards> rewardMap : xsRewardsList.entrySet()) {
+
+                    XSRewards xsRewards = rewardMap.getValue();
+
+                    if(XSHandler.getXsItemmailsHashMap().containsKey(xsRewards.getIdKeyReward())) {
+                        tempXSReward.put(rewardMap.getKey(),xsRewards);
+                    } else {
+                        Bukkit.broadcastMessage("NOT HAVE KEY : " + xsRewards.getIdKeyReward());
+                    }
+                }
+
+                int startIndex = 0;
+                int endIndex = 0;
+
+                startIndex = (XSHandler.getPlayerPage().get(p)-1)*sizeSlot;
+                endIndex = Math.min(startIndex + sizeSlot-1, tempXSReward.size());
+
+                if(endIndex+1 < tempXSReward.size()) {
+                    int slot = fileConfiguration.getInt("settings.additional_info.next_button");
+                    guiSection.put(slot,"next_button_inventory_reward");
+                    inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
+                }
+                if(XSHandler.getPlayerPage().get(p) > 1) {
+                    int slot = fileConfiguration.getInt("settings.additional_info.back_button");
+                    guiSection.put(slot,"back_button_inventory_reward");
+                    inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
+                }
+
+                List<Map.Entry<String, XSRewards>> entryList = new ArrayList<>(tempXSReward.entrySet());
+
+                if(endIndex+1 < tempXSReward.size()) {
+                    entryList = entryList.subList(startIndex, endIndex+1);
+                } else {
+                    entryList = entryList.subList(startIndex, endIndex);
+                }
+
+                List<String> stringList = fileConfiguration.getStringList("settings.additional_info.rewards_slot");
+                ArrayList<String> slotList = new ArrayList<>(stringList);
+                int index = 0;
+                for (Map.Entry<String, XSRewards> entry : entryList) {
+
+                    XSRewards xsRewards = entry.getValue();
+
+                    int slot = Integer.parseInt(slotList.get(index));
+                    guiSection.put(slot,entry.getKey());
+
+                    XSItemmails xsItemmailsData = XSHandler.getXsItemmailsHashMap().get(xsRewards.getIdKeyReward());
+
+                    ItemStack itWithAddLore = XSUtils.itemStackFromBase64(xsItemmailsData.getItemDisplay()).clone();
+
+                    ItemMeta itemMeta = itWithAddLore.getItemMeta();
+
+                    if(itemMeta.hasDisplayName()) {
+                        itemMeta.setDisplayName(itemMeta.getDisplayName() + XSUtils.decodeText(" <gray>x" + xsRewards.getCount()));
+                    } else {
+                        itemMeta.setDisplayName(XSUtils.decodeText("<white>" + itWithAddLore.getType() + " <gray>x" + xsRewards.getCount()));
+                    }
+
+                    ArrayList<String> arrayList = new ArrayList();
+                    for(String lore : mainConfig.getConfig().getStringList("settings.rewards_click_to_claim")) {
+                        arrayList.add(XSUtils.decodeText(lore));
+                    }
+
+                    if(itemMeta.hasLore()) {
+                        ArrayList<String> loreTemp = new ArrayList<>();
+
+                        loreTemp.addAll(itemMeta.getLore());
+                        loreTemp.addAll(arrayList);
+                        itemMeta.setLore(loreTemp);
+                    } else {
+                        itemMeta.setLore(arrayList);
+                    }
+
+                    itWithAddLore.setItemMeta(itemMeta);
+
+                    inv.setItem(slot,itWithAddLore);
+                    index++;
+                }
+
+            } else {
+                Bukkit.broadcastMessage("NOT HAVE REWARD");
             }
 
         }

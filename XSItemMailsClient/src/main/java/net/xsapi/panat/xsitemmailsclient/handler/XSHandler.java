@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class XSHandler {
 
     private static HashMap<String, Integer> playerDataReference = new HashMap<>();
-    private static HashMap<Integer, ArrayList<XSRewards>> xsRewardsHashMap = new HashMap<>();
+    private static HashMap<Integer, HashMap<String,XSRewards>> xsRewardsHashMap = new HashMap<>();
     private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
     private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
     private static HashMap<Player, String> playerEditorKey = new HashMap<>();
@@ -33,11 +33,11 @@ public class XSHandler {
 
     private static String serverClient;
 
-    public static HashMap<Integer,ArrayList<XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
+    public static HashMap<Integer,HashMap<String,XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
 
     public static HashMap<String,Integer> getPlayerDataReference() { return playerDataReference; }
 
-    public static void setXsRewardsHashMap(HashMap<Integer, ArrayList<XSRewards>> map) {
+    public static void setXsRewardsHashMap(HashMap<Integer, HashMap<String,XSRewards>> map) {
         xsRewardsHashMap = map;
     }
 

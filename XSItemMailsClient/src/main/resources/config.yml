@@ -19,6 +19,9 @@ settings:
     - ""
     - "<color:#FFE92F>[Q] <red>เพื่อทำการลบไอเทมออก"
     - "<color:#FFE92F>[▶] <gray>คลิก <color:#FFE92F>ซ้าย <gray>เพื่อทำการแก้ไขไอเทม"
+  rewards_click_to_claim:
+    - ""
+    - "<color:#FFE92F>[▶] <gray>คลิก <color:#FFE92F>ซ้าย <gray>เพื่อทำการรับไอเทม"
   barrier:
     material: BLACK_STAINED_GLASS_PANE
     amount: 1

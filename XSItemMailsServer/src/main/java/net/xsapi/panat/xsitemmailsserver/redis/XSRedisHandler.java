@@ -171,7 +171,7 @@ public class XSRedisHandler {
                                 String commandender = args.split(";")[4];
 
                                 String serverGroup = XSHandler.getServergroup(serverClient);
-                                XSDatabaseHandler.givePlayerReward(playerName,serverGroup,XSHandler.getItemRewardIDByKey(serverGroup,key),amount);
+                                XSDatabaseHandler.givePlayerReward(playerName,serverGroup,key,amount);
 
                             } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.REQUEST_PLAYER_REWARD_TO_SERVER)) {
 

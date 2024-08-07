@@ -20,7 +20,7 @@ public class XSHandler {
 
     //<server>:<p_id>:<data>
     private static HashMap<String,Integer> playerDataReference = new HashMap<>();
-    private static HashMap<String,HashMap<Integer,ArrayList<XSRewards>>> playerRewardData = new HashMap<>();
+    private static HashMap<String,HashMap<Integer,HashMap<String,XSRewards>>> playerRewardData = new HashMap<>();
     private static HashMap<String,HashMap<String, XSItemmails>> itemmailsList = new HashMap<>();
     private static ArrayList<String> updatedKey = new ArrayList<>();
 
@@ -28,7 +28,7 @@ public class XSHandler {
         return playerDataReference;
     }
 
-    public static HashMap<String, HashMap<Integer, ArrayList<XSRewards>>> getPlayerRewardData() {
+    public static HashMap<String, HashMap<Integer, HashMap<String,XSRewards>>> getPlayerRewardData() {
         return playerRewardData;
     }
 
@@ -106,6 +106,7 @@ public class XSHandler {
         }
     }
 
+
     public static int getItemRewardIDByKey(String serverGroup,String idKey) {
 
         return XSHandler.getItemmailsList(serverGroup).get(idKey).getId();
@@ -116,6 +117,7 @@ public class XSHandler {
             itemmailsList.put(group,new HashMap<>());
             loadDataFromSQL(group);
 
+            XSHandler.getPlayerRewardData().put(group,new HashMap<>());
             XSDatabaseHandler.loadPlayerReward(group);
         }
         sendDataToEachServer();

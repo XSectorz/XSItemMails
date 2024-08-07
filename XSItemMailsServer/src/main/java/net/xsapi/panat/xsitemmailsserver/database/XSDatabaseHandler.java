@@ -109,28 +109,33 @@ public class XSDatabaseHandler {
             String selectQuery = "SELECT * FROM xsitemmails_bungee_" + serverGroup;
             ResultSet resultSet = statement.executeQuery(selectQuery);
 
-            HashMap<Integer,ArrayList<XSRewards>> arrayData = new HashMap<>();
+            HashMap<Integer,HashMap<String,XSRewards>> mapData = new HashMap<>();
 
             while (resultSet.next()) {
                 int reference =  resultSet.getInt("Reference");
                 String itemData = resultSet.getString("itemData");
 
-                ArrayList<XSRewards> tempData = new ArrayList<>();
+                HashMap<String,XSRewards> rewardData = new HashMap<>();
 
                 for(String reward : itemData.split(";")) {
 
-                    int idReward = Integer.parseInt(reward.split(":")[0]);
+                    String idReward = reward.split(":")[0];
                     int amount = Integer.parseInt(reward.split(":")[1]);
 
+                    if(!XSHandler.getItemmailsList(serverGroup).containsKey(idReward)) {
+                        continue;
+                    }
+
+                    UUID uuid = UUID.randomUUID();
                     XSRewards xsRewards = new XSRewards(idReward,amount);
 
-                    tempData.add(xsRewards);
+                    rewardData.put(uuid.toString(),xsRewards);
 
                 }
-                arrayData.put(reference,tempData);
+                mapData.put(reference,rewardData);
             }
 
-            XSHandler.getPlayerRewardData().put(serverGroup,arrayData);
+            XSHandler.getPlayerRewardData().put(serverGroup,mapData);
             statement.close();
             connection.close();
 
@@ -149,7 +154,7 @@ public class XSDatabaseHandler {
 
            // String query = "UPDATE xsitemmails_bungee_" + serverGroup + " SET itemData = ? WHERE Reference = ?";
 
-            for(Map.Entry<Integer,ArrayList<XSRewards>> rewardList : XSHandler.getPlayerRewardData().get(serverGroup).entrySet()) {
+            for(Map.Entry<Integer,HashMap<String,XSRewards>> rewardList : XSHandler.getPlayerRewardData().get(serverGroup).entrySet()) {
 
                // PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
 
@@ -162,12 +167,17 @@ public class XSDatabaseHandler {
                     String query = "UPDATE xsitemmails_bungee_" + serverGroup + " SET itemData = ? WHERE Reference = ?";
 
                     StringBuilder result = new StringBuilder();
-                    for (int i = 0; i < rewardList.getValue().size() ; i++) {
-                        XSRewards reward = rewardList.getValue().get(i);
-                        result.append(reward.getIdReward()).append(":").append(reward.getCount());
-                        if (i < rewardList.getValue().size() - 1) {
+
+                    int i = 0;
+                    for(Map.Entry<String,XSRewards> rewards : rewardList.getValue().entrySet()) {
+                        XSRewards reward = rewards.getValue();
+
+                        result.append(reward.getIdKeyReward()).append(":").append(reward.getCount());
+                        if(i < rewardList.getValue().size()-1) {
                             result.append(";");
                         }
+
+                        i++;
                     }
 
                     if (!exists) {
@@ -196,7 +206,7 @@ public class XSDatabaseHandler {
 
     }
 
-    public static void givePlayerReward(String playerName,String serverGroup,int idReward,int amount) {
+    public static void givePlayerReward(String playerName,String serverGroup,String idReward,int amount) {
         try {
             Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
             String checkPlayerQuery = "SELECT id FROM " + getGlobalPlayerTable() + " WHERE playerName = ?";
@@ -208,10 +218,14 @@ public class XSDatabaseHandler {
                 int id = resultSet.getInt("id");
                 core.getPlugin().getLogger().info("PLAYER ID " + id);
 
+                UUID uuid = UUID.randomUUID();
+
                 if(XSHandler.getPlayerRewardData().get(serverGroup).containsKey(id)) {
-                    XSHandler.getPlayerRewardData().get(serverGroup).get(id).add(new XSRewards(idReward,amount));
+                    XSHandler.getPlayerRewardData().get(serverGroup).get(id).put(uuid.toString(),new XSRewards(idReward,amount));
                 } else {
-                    XSHandler.getPlayerRewardData().get(serverGroup).put(id,new ArrayList<>(Collections.singletonList(new XSRewards(idReward, amount))));
+                    HashMap<String, XSRewards> rewardMap = new HashMap<>();
+                    rewardMap.put(uuid.toString(), new XSRewards(idReward, amount));
+                    XSHandler.getPlayerRewardData().get(serverGroup).put(id,rewardMap);
                 }
 
                 XSHandler.sendPlayerRewardToSubServer(serverGroup);

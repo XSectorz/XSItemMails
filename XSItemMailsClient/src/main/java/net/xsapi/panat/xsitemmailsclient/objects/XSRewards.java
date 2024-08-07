@@ -2,21 +2,21 @@ package net.xsapi.panat.xsitemmailsclient.objects;
 
 public class XSRewards {
 
-    private int idReward;
+    private String idKeyReward;
     private int count;
 
-    public XSRewards(int idReward, int count) {
+    public XSRewards(String idKeyReward, int count) {
 
         this.count = count;
-        this.idReward = idReward;
+        this.idKeyReward = idKeyReward;
 
+    }
+
+    public String getIdKeyReward() {
+        return idKeyReward;
     }
 
     public int getCount() {
         return count;
-    }
-
-    public int getIdReward() {
-        return idReward;
     }
 }

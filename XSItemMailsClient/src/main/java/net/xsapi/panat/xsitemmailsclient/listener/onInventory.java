@@ -127,7 +127,6 @@ public class onInventory implements Listener {
 
                 if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
                     String key = XSHandler.getPlayerGUISection().get(p).get(slot);
-                    p.sendMessage(key);
                     if (key.equalsIgnoreCase("back_to_main_menu")) {
                         XSHandler.getPlayerPage().put(p,1);
                         p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU),p,null));
@@ -189,6 +188,10 @@ public class onInventory implements Listener {
 
                 if (key.equalsIgnoreCase("close")) {
                     p.closeInventory();
+                } else {
+
+                    p.sendMessage(key);
+
                 }
             }
         }
