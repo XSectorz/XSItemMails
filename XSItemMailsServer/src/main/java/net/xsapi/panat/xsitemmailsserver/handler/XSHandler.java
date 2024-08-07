@@ -7,6 +7,7 @@ import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.database.XSDatabaseHandler;
 import net.xsapi.panat.xsitemmailsserver.listeners.eventLoader;
 import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsserver.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsserver.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsserver.redis.XS_REDIS_MESSAGES;
 
@@ -17,8 +18,14 @@ import java.util.HashMap;
 
 public class XSHandler {
 
+    //<server>:<p_id>:<data>
+    private static HashMap<String,HashMap<Integer,ArrayList<XSRewards>>> playerRewardData = new HashMap<>();
     private static HashMap<String,HashMap<String, XSItemmails>> itemmailsList = new HashMap<>();
     private static ArrayList<String> updatedKey = new ArrayList<>();
+
+    public static HashMap<String, HashMap<Integer, ArrayList<XSRewards>>> getPlayerRewardData() {
+        return playerRewardData;
+    }
 
     public static HashMap<String, XSItemmails> getItemmailsList(String server) {
 
@@ -47,13 +54,39 @@ public class XSHandler {
         //Load data from database
         loadDataEachServer();
 
+        //Sent data to each server
+        sendPlayerRewardToAllServer();
 
+
+
+    }
+
+    public static void sendPlayerRewardToAllServer() {
+        for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
+            sendPlayerRewardToSubServer(group);
+        }
+    }
+
+    public static void sendPlayerRewardToSubServer(String serverGroup) {
+
+        Gson gson = new Gson();
+        String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
+        for(String group : mainConfig.getConfig().getStringList("group-servers."+serverGroup)) {
+            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(group), XS_REDIS_MESSAGES.SENT_PLAYER_REWARD_TO_CLIENT+"<SPLIT>"+dataJSON);
+        }
+    }
+
+    public static int getItemRewardIDByKey(String serverGroup,String idKey) {
+
+        return XSHandler.getItemmailsList(serverGroup).get(idKey).getId();
     }
 
     public static void loadDataEachServer() {
         for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
             itemmailsList.put(group,new HashMap<>());
             loadDataFromSQL(group);
+
+            XSDatabaseHandler.loadPlayerReward(group);
         }
         sendDataToEachServer();
     }
@@ -76,6 +109,14 @@ public class XSHandler {
             }
         }
 
+    }
+
+    public static void savePlayerData() {
+        for(String serverGroup : mainConfig.getConfig().getSection("group-servers").getKeys()) {
+
+            XSDatabaseHandler.savePlayerReward(serverGroup);
+
+        }
     }
 
     public static String getServergroup(String subServer) {

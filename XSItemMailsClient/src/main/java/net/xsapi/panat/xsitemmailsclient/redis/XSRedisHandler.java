@@ -8,6 +8,7 @@ import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -180,6 +181,15 @@ public class XSRedisHandler {
                                         }
                                     }, 1L);
                                 }
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_REWARD_TO_CLIENT)) {
+
+                                String dataJSON = args.split(";")[0];
+
+                                Gson gson = new Gson();
+                                HashMap<Integer, ArrayList<XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer, ArrayList<XSRewards>>>(){}.getType());
+
+                                XSHandler.setXsRewardsHashMap(dataList);
+
                             }
                         }
 

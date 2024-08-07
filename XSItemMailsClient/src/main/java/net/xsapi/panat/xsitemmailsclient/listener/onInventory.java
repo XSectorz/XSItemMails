@@ -180,6 +180,17 @@ public class onInventory implements Listener {
                     }
                 }
             }
+        } else if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY).getString("settings.title")))) {
+            e.setCancelled(true);
+            int slot = e.getSlot();
+
+            if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
+                String key = XSHandler.getPlayerGUISection().get(p).get(slot);
+
+                if (key.equalsIgnoreCase("close")) {
+                    p.closeInventory();
+                }
+            }
         }
 
     }

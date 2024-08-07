@@ -7,6 +7,7 @@ import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.listener.eventLoader;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
@@ -15,10 +16,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class XSHandler {
 
+    private static HashMap<Integer, ArrayList<XSRewards>> xsRewardsHashMap = new HashMap<>();
     private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
     private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
     private static HashMap<Player, String> playerEditorKey = new HashMap<>();
@@ -28,6 +31,12 @@ public class XSHandler {
     private static HashMap<Player,HashMap<Integer,String>> playerGUISection = new HashMap<>();
 
     private static String serverClient;
+
+    public static HashMap<Integer,ArrayList<XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
+
+    public static void setXsRewardsHashMap(HashMap<Integer, ArrayList<XSRewards>> map) {
+        xsRewardsHashMap = map;
+    }
 
     public static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> getPlayerCreatorTopics() {
         return playerCreatorTopics;
@@ -83,7 +92,12 @@ public class XSHandler {
 
         //Req data
         reqDataFromServer();
+        sendRequestPlayerReward();
 
+    }
+
+    public static void sendRequestPlayerReward() {
+        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.REQUEST_PLAYER_REWARD_TO_SERVER+"<SPLIT>"+XSHandler.getServerClient());
     }
 
     public static void closeAllOpenInventory() {

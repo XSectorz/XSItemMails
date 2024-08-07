@@ -8,6 +8,7 @@ public class configLoader {
         new menuConfig().loadConfigu(XS_MENU_FILE.XS_MAIN_MENU);
         new menuConfig().loadConfigu(XS_MENU_FILE.XS_ITEM_CREATE);
         new menuConfig().loadConfigu(XS_MENU_FILE.XS_REWARD_ITEMS);
+        new menuConfig().loadConfigu(XS_MENU_FILE.XS_INVENTORY);
     }
 
 }

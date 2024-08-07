@@ -29,5 +29,6 @@ public final class core extends Plugin {
 
         XSRedisHandler.destroyThreads();
         XSDatabaseHandler.saveDataToSQL();
+        XSHandler.savePlayerData();
     }
 }

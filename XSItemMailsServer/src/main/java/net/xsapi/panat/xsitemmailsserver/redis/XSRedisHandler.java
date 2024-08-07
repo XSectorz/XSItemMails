@@ -162,6 +162,25 @@ public class XSRedisHandler {
 
                                 XSHandler.sendDataToSpecificServerGroup(XS_REDIS_MESSAGES.DELETE_ITEM_TO_CLIENT,serverGroup,playerName+";"+serverClient);
 
+                            } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.GIVE_ITEM_SENT_TO_SERVER)) {
+
+                                String key = args.split(";")[0];
+                                int amount = Integer.parseInt(args.split(";")[1]);
+                                String playerName = args.split(";")[2];
+                                String serverClient = args.split(";")[3];
+                                String commandender = args.split(";")[4];
+
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+                                XSDatabaseHandler.givePlayerReward(playerName,serverGroup,XSHandler.getItemRewardIDByKey(serverGroup,key),amount);
+
+                            } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.REQUEST_PLAYER_REWARD_TO_SERVER)) {
+
+                                String serverClient = args.split(";")[0];
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+
+                                Gson gson = new Gson();
+                                String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
+                                XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverGroup), XS_REDIS_MESSAGES.SENT_PLAYER_REWARD_TO_CLIENT+"<SPLIT>"+dataJSON);
                             }
 
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));

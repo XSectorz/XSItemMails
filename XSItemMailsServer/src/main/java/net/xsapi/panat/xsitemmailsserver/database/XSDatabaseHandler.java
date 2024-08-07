@@ -5,10 +5,10 @@ import net.xsapi.panat.xsitemmailsserver.config.mainConfig;
 import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsserver.objects.XSRewards;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class XSDatabaseHandler {
 
@@ -71,6 +71,132 @@ public class XSDatabaseHandler {
         }
         core.getPlugin().getLogger().info("******************************");
 
+    }
+
+    public static void loadPlayerReward(String serverGroup) {
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
+            Statement statement = connection.createStatement();
+
+            String selectQuery = "SELECT * FROM xsitemmails_bungee_" + serverGroup;
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+
+            HashMap<Integer,ArrayList<XSRewards>> arrayData = new HashMap<>();
+
+            while (resultSet.next()) {
+                int reference =  resultSet.getInt("Reference");
+                String itemData = resultSet.getString("itemData");
+
+                ArrayList<XSRewards> tempData = new ArrayList<>();
+
+                for(String reward : itemData.split(";")) {
+
+                    int idReward = Integer.parseInt(reward.split(":")[0]);
+                    int amount = Integer.parseInt(reward.split(":")[1]);
+
+                    XSRewards xsRewards = new XSRewards(idReward,amount);
+
+                    tempData.add(xsRewards);
+
+                }
+                arrayData.put(reference,tempData);
+            }
+
+            XSHandler.getPlayerRewardData().put(serverGroup,arrayData);
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void savePlayerReward(String serverGroup) {
+
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
+
+            String checkPlayerQuery = "SELECT EXISTS(SELECT * FROM xsitemmails_bungee_" + serverGroup + " WHERE Reference = ?) AS exist";
+
+           // String query = "UPDATE xsitemmails_bungee_" + serverGroup + " SET itemData = ? WHERE Reference = ?";
+
+            for(Map.Entry<Integer,ArrayList<XSRewards>> rewardList : XSHandler.getPlayerRewardData().get(serverGroup).entrySet()) {
+
+               // PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+
+                PreparedStatement preparedStatement = connection.prepareStatement(checkPlayerQuery);
+                preparedStatement.setInt(1, rewardList.getKey());
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                if (resultSet.next()) {
+                    boolean exists = resultSet.getBoolean("exist");
+                    String query = "UPDATE xsitemmails_bungee_" + serverGroup + " SET itemData = ? WHERE Reference = ?";
+
+                    StringBuilder result = new StringBuilder();
+                    for (int i = 0; i < rewardList.getValue().size() ; i++) {
+                        XSRewards reward = rewardList.getValue().get(i);
+                        result.append(reward.getIdReward()).append(":").append(reward.getCount());
+                        if (i < rewardList.getValue().size() - 1) {
+                            result.append(";");
+                        }
+                    }
+
+                    if (!exists) {
+                        query = "INSERT INTO xsitemmails_bungee_" + serverGroup + " (Reference, itemData) VALUES (?, ?)";
+                        PreparedStatement insertStatement = connection.prepareStatement(query);
+                        insertStatement.setInt(1, rewardList.getKey());
+                        insertStatement.setString(2, result.toString());
+                        insertStatement.executeUpdate();
+                        insertStatement.close();
+                    } else {
+                        PreparedStatement updateStatement = connection.prepareStatement(query);
+                        updateStatement.setString(1, result.toString());
+                        updateStatement.setInt(2, rewardList.getKey());
+                        updateStatement.executeUpdate();
+                        updateStatement.close();
+                        connection.close();
+                    }
+
+                }
+
+            }
+
+        }   catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void givePlayerReward(String playerName,String serverGroup,int idReward,int amount) {
+        try {
+            Connection connection = DriverManager.getConnection(XSDatabaseHandler.getJDBCUrl(), XSDatabaseHandler.getUSER(), XSDatabaseHandler.getPASS());
+            String checkPlayerQuery = "SELECT id FROM " + getGlobalPlayerTable() + " WHERE playerName = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(checkPlayerQuery);
+            preparedStatement.setString(1,playerName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                core.getPlugin().getLogger().info("PLAYER ID " + id);
+
+                if(XSHandler.getPlayerRewardData().get(serverGroup).containsKey(id)) {
+                    XSHandler.getPlayerRewardData().get(serverGroup).get(id).add(new XSRewards(idReward,amount));
+                } else {
+                    XSHandler.getPlayerRewardData().get(serverGroup).put(id,new ArrayList<>(Collections.singletonList(new XSRewards(idReward, amount))));
+                }
+
+                XSHandler.sendPlayerRewardToSubServer(serverGroup);
+
+            } else {
+                core.getPlugin().getLogger().info("PLAYER NULL");
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void saveDataToSQL() {

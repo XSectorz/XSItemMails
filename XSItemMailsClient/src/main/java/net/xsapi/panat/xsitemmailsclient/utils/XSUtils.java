@@ -119,7 +119,12 @@ public class XSUtils {
                 inv.setItem(slot,XSUtils.itemStackFromBase64(xsItemmails.getItemDisplay()));
             }
         }
-
+        if(fileConfiguration.get("settings.additional_info.barrier_slot") != null) {
+            ItemStack barrier = XSUtils.decodeItemFromConfig("settings.barrier",mainConfig.getConfig(),p.getName(),null);
+            for(String slot : fileConfiguration.getStringList("settings.additional_info.barrier_slot")) {
+                inv.setItem(Integer.parseInt(slot),barrier);
+            }
+        }
 
         if(fileConfiguration.get("settings.additional_info.items_generate") != null) {
 
@@ -167,7 +172,13 @@ public class XSUtils {
 
                 ItemMeta itemMeta = itWithAddLore.getItemMeta();
 
-                if(itemMeta.getLore() != null) {
+                if(itemMeta.hasDisplayName()) {
+                    itemMeta.setDisplayName(itemMeta.getDisplayName() + XSUtils.decodeText(" <gray>(id: " + entry.getKey() + ")"));
+                } else {
+                    itemMeta.setDisplayName(XSUtils.decodeText("<white>" + itWithAddLore.getType() + " <gray>(id: " + entry.getKey() + ")"));
+                }
+
+                if(itemMeta.hasLore()) {
                     ArrayList<String> loreTemp = new ArrayList<>();
 
                     loreTemp.addAll(itemMeta.getLore());
