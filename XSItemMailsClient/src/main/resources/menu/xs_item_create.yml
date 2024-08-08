@@ -39,6 +39,7 @@ settings:
         - "<color:#03BA00>▪ <gray>[CONSOLE] ใช้สำหรับแทนการรันคำสั่งโดยเซิฟเวอร์"
         - "<color:#03BA00>▪ <gray>[PLAYER] ใช้สำหรับแทนการรันคำสั่งโดยผู้เล่น"
         - "<color:#03BA00>▪ <gray>%player% สำหรับแทนที่ชื่อผู้เล่นอัติโนมัติ"
+        - "<color:#03BA00>▪ <gray>%count% สำหรับแทนจำนวน (ต่อจำนวนของขวัญ)"
         - ""
         - "<color:#03BA00>ตัวอย่างการใช้งาน"
         - "<color:#03BA00>▪ <gray>[CONSOLE] give %player% diamond 64"

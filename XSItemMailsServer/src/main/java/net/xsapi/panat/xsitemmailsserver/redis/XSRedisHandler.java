@@ -7,6 +7,7 @@ import net.xsapi.panat.xsitemmailsserver.core;
 import net.xsapi.panat.xsitemmailsserver.database.XSDatabaseHandler;
 import net.xsapi.panat.xsitemmailsserver.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsserver.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsserver.objects.XSRewards;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -186,6 +187,28 @@ public class XSRedisHandler {
                                 String serverClient = args.split(";")[0];
 
                                 XSHandler.sendPlayerDataReferenceToSpecificSubServer(serverClient);
+                            } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_ITEM_REQUEST_TO_SERVER)) {
+
+                                int idRef = Integer.parseInt(args.split(";")[0]);
+                                String uniqueKey = args.split(";")[1];
+                                String playerName = args.split(";")[2];
+                                String serverClient = args.split(";")[3];
+                                String serverGroup = XSHandler.getServergroup(serverClient);
+
+                                XSRewards xsRewards = XSHandler.getPlayerRewardData().get(serverGroup).get(idRef).get(uniqueKey);
+
+                                XSHandler.getPlayerRewardData().get(serverGroup).get(idRef).remove(uniqueKey);
+                                Gson gson = new Gson();
+                                String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
+
+                                if(XSHandler.getItemmailsList(serverGroup).containsKey(xsRewards.getIdKeyReward())) {
+                                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT+"<SPLIT>"
+                                    +"reward_check_pass;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON);
+                                } else {
+                                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT+"<SPLIT>"
+                                            +"reward_check_fail;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON);
+                                }
+
                             }
 
                            core.getPlugin().getLogger().info(("Recieved " + message + " From Client"));

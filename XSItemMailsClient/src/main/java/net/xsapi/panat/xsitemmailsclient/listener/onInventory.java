@@ -8,6 +8,7 @@ import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.handler.XS_ITEMS_EDITOR_TOPICS;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
+import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
@@ -79,7 +80,7 @@ public class onInventory implements Listener {
 
         Player p = (Player) e.getWhoClicked();
 
-        if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU).getString("settings.title")))) {
+        if(!e.getClickedInventory().equals(e.getView().getBottomInventory()) && e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU).getString("settings.title")))) {
 
             int slot = e.getSlot();
 
@@ -188,9 +189,25 @@ public class onInventory implements Listener {
 
                 if (key.equalsIgnoreCase("close")) {
                     p.closeInventory();
+                } else if(key.equalsIgnoreCase("next_button_inventory_reward")) {
+                    XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)+1);
+                    XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY),p,null);
+                } else if(key.equalsIgnoreCase("back_button_inventory_reward")) {
+                    if(XSHandler.getPlayerPage().get(p) > 1) {
+                        XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)-1);
+                        XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY),p,null);
+                    }
                 } else {
 
-                    p.sendMessage(key);
+                    int playerIDRef = XSHandler.getPlayerDataReference().get(p.getName());
+
+                    //XSRewards xsReward = XSHandler.getXsRewardsHashMap().get(playerIDRef).get(key);
+
+                    //p.sendMessage(key);
+                    //p.sendMessage(xsReward.getIdKeyReward() + " : " + xsReward.getCount());
+
+                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.SENT_ITEM_REQUEST_TO_SERVER+"<SPLIT>"+playerIDRef+";"+key+";"+p.getName()+";"+XSHandler.getServerClient());
+
 
                 }
             }

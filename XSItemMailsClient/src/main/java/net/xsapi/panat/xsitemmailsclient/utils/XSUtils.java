@@ -129,12 +129,19 @@ public class XSUtils {
 
         if(fileConfiguration.get("settings.additional_info.rewards_slot") != null) {
 
+            for(String slotStr : fileConfiguration.getStringList("settings.additional_info.rewards_slot")) {
+                int slot = Integer.parseInt(slotStr);
+
+                inv.setItem(slot,new ItemStack(Material.AIR));
+            }
+
+
             if(XSHandler.getXsRewardsHashMap().containsKey(XSHandler.getPlayerDataReference().get(p.getName()))) {
 
                 int sizeSlot = fileConfiguration.getStringList("settings.additional_info.rewards_slot").size();
 
-                Bukkit.broadcastMessage("HAVE REWARD KEY : " + XSHandler.getPlayerDataReference().get(p.getName()));
-                Bukkit.broadcastMessage("REWARD SIZE : " + XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName())).size());
+               // Bukkit.broadcastMessage("HAVE REWARD KEY : " + XSHandler.getPlayerDataReference().get(p.getName()));
+               // Bukkit.broadcastMessage("REWARD SIZE : " + XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName())).size());
 
                 HashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName()));
                 HashMap<String,XSRewards> tempXSReward = new HashMap<>();
@@ -146,7 +153,7 @@ public class XSUtils {
                     if(XSHandler.getXsItemmailsHashMap().containsKey(xsRewards.getIdKeyReward())) {
                         tempXSReward.put(rewardMap.getKey(),xsRewards);
                     } else {
-                        Bukkit.broadcastMessage("NOT HAVE KEY : " + xsRewards.getIdKeyReward());
+                        //Bukkit.broadcastMessage("NOT HAVE KEY : " + xsRewards.getIdKeyReward());
                     }
                 }
 
@@ -155,25 +162,32 @@ public class XSUtils {
 
                 startIndex = (XSHandler.getPlayerPage().get(p)-1)*sizeSlot;
                 endIndex = Math.min(startIndex + sizeSlot-1, tempXSReward.size());
+                int slotNext = fileConfiguration.getInt("settings.additional_info.next_button.slot");
+                int slotBack = fileConfiguration.getInt("settings.additional_info.back_button.slot");
+
+                inv.setItem(slotNext,new ItemStack(Material.AIR));
+                inv.setItem(slotBack,new ItemStack(Material.AIR));
 
                 if(endIndex+1 < tempXSReward.size()) {
-                    int slot = fileConfiguration.getInt("settings.additional_info.next_button");
-                    guiSection.put(slot,"next_button_inventory_reward");
-                    inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
+                    guiSection.put(slotNext,"next_button_inventory_reward");
+                    inv.setItem(slotNext,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
                 }
                 if(XSHandler.getPlayerPage().get(p) > 1) {
-                    int slot = fileConfiguration.getInt("settings.additional_info.back_button");
-                    guiSection.put(slot,"back_button_inventory_reward");
-                    inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
+                    guiSection.put(slotBack,"back_button_inventory_reward");
+                    inv.setItem(slotBack,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
                 }
 
                 List<Map.Entry<String, XSRewards>> entryList = new ArrayList<>(tempXSReward.entrySet());
 
-                if(endIndex+1 < tempXSReward.size()) {
+                if(endIndex+1 <= tempXSReward.size()) {
                     entryList = entryList.subList(startIndex, endIndex+1);
                 } else {
                     entryList = entryList.subList(startIndex, endIndex);
                 }
+
+                //Bukkit.broadcastMessage("Reward Size: " + tempXSReward.size());
+                //Bukkit.broadcastMessage("Start Index: " + startIndex);
+                //Bukkit.broadcastMessage("End Index: " + endIndex);
 
                 List<String> stringList = fileConfiguration.getStringList("settings.additional_info.rewards_slot");
                 ArrayList<String> slotList = new ArrayList<>(stringList);
@@ -226,6 +240,12 @@ public class XSUtils {
 
         if(fileConfiguration.get("settings.additional_info.items_generate") != null) {
 
+            for(String slotStr : fileConfiguration.getStringList("settings.additional_info.items_generate")) {
+                int slot = Integer.parseInt(slotStr);
+
+                inv.setItem(slot,new ItemStack(Material.AIR));
+            }
+
             int sizeSlot = fileConfiguration.getStringList("settings.additional_info.items_generate").size();
             HashMap<String, XSItemmails> itemList = XSHandler.getXsItemmailsHashMap();
             List<Map.Entry<String, XSItemmails>> entryList = new ArrayList<>(itemList.entrySet());
@@ -236,18 +256,26 @@ public class XSUtils {
             startIndex = (XSHandler.getPlayerPage().get(p)-1)*sizeSlot;
             endIndex = Math.min(startIndex + sizeSlot-1, itemList.size());
 
-            if(endIndex+1 < itemList.size()) {
-                int slot = fileConfiguration.getInt("settings.additional_info.next_button");
-                guiSection.put(slot,"next_button");
-                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
-            }
-            if(XSHandler.getPlayerPage().get(p) > 1) {
-                int slot = fileConfiguration.getInt("settings.additional_info.back_button");
-                guiSection.put(slot,"back_button");
-                inv.setItem(slot,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
-            }
+            int slotNext = fileConfiguration.getInt("settings.additional_info.next_button.slot");
+            int slotBack = fileConfiguration.getInt("settings.additional_info.back_button.slot");
+
+            inv.setItem(slotNext,new ItemStack(Material.AIR));
+            inv.setItem(slotBack,new ItemStack(Material.AIR));
+
+            //Bukkit.broadcastMessage("Reward Size: " + itemList.size());
+            //Bukkit.broadcastMessage("Start Index: " + startIndex);
+            //Bukkit.broadcastMessage("End Index: " + endIndex);
 
             if(endIndex+1 < itemList.size()) {
+                guiSection.put(slotNext,"next_button");
+                inv.setItem(slotNext,decodeItemFromConfig("settings.additional_info.next_button",fileConfiguration,p.getName(),xsItemmails));
+            }
+            if(XSHandler.getPlayerPage().get(p) > 1) {
+                guiSection.put(slotBack,"back_button");
+                inv.setItem(slotBack,decodeItemFromConfig("settings.additional_info.back_button",fileConfiguration,p.getName(),xsItemmails));
+            }
+
+            if(endIndex+1 <= itemList.size()) {
                 entryList = entryList.subList(startIndex, endIndex+1);
             } else {
                 entryList = entryList.subList(startIndex, endIndex);

@@ -11,6 +11,7 @@ import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -209,6 +210,47 @@ public class XSRedisHandler {
                                 }
 
                                 XSHandler.setPlayerDataReference(dataList);
+
+                            }  else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT)) {
+
+                                String response = args.split(";")[0];
+                                String rewardID = args.split(";")[1];
+                                int rewardCount = Integer.parseInt(args.split(";")[2]);
+                                String playerName = args.split(";")[3];
+                                String dataJSON = args.split(";")[4];
+
+                                //Set new data before do something
+                                Gson gson = new Gson();
+                                HashMap<Integer, HashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer,  HashMap<String,XSRewards>>>(){}.getType());
+                                XSHandler.setXsRewardsHashMap(dataList);
+
+                                Player p = Bukkit.getPlayer(playerName);
+
+                                if(response.equalsIgnoreCase("reward_check_pass")) {
+
+                                    XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(rewardID);
+
+                                    Bukkit.getLogger().info("Reward: " + xsItemmails.getRewardItems());
+                                    Bukkit.getLogger().info("Command: " + xsItemmails.getRewardCommands());
+                                    Bukkit.getLogger().info("Count: " + rewardCount);
+
+                                } else {
+                                    Bukkit.getLogger().info("Player : " + playerName + " fail to get " + rewardID + " with " + rewardCount);
+                                }
+
+
+                                FileConfiguration fileConfiguration = menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY);
+                                int sizeSlot = fileConfiguration.getStringList("settings.additional_info.rewards_slot").size();
+                                int playerIDRef = XSHandler.getPlayerDataReference().get(playerName);
+                                int rewardSize = XSHandler.getXsRewardsHashMap().get(playerIDRef).size();
+
+                                int currentPage = (int) Math.ceil((double) rewardSize /(double) sizeSlot);
+
+                                XSHandler.getPlayerPage().put(p,currentPage);
+                                XSUtils.updateInventoryContent(fileConfiguration,p,null);
+
+
+
 
                             }
                         }
