@@ -80,7 +80,7 @@ public class XSUtils {
         String title = XSUtils.decodeText(file.getString("settings.title"));
         int size = file.getInt("settings.size");
 
-        XSHandler.getPlayerGUISection().put(p,new HashMap<>());
+        XSHandler.getPlayerGUISection().put(p,new LinkedHashMap<>());
 
         Inventory inv = Bukkit.createInventory(null,size,title);
 
@@ -94,7 +94,7 @@ public class XSUtils {
     public static void updateInventoryContent(FileConfiguration fileConfiguration, Player p,XSItemmails xsItemmails) {
 
         Inventory inv = XSHandler.getPlayerOpenInventory().get(p);
-        HashMap<Integer,String> guiSection = new HashMap<>();
+        LinkedHashMap<Integer,String> guiSection = new LinkedHashMap<>();
 
         for(String content : fileConfiguration.getConfigurationSection("settings.additional_contents").getKeys(false)) {
             int slot = fileConfiguration.getInt("settings.additional_contents." + content + ".slot");
@@ -143,8 +143,8 @@ public class XSUtils {
                // Bukkit.broadcastMessage("HAVE REWARD KEY : " + XSHandler.getPlayerDataReference().get(p.getName()));
                // Bukkit.broadcastMessage("REWARD SIZE : " + XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName())).size());
 
-                HashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName()));
-                HashMap<String,XSRewards> tempXSReward = new HashMap<>();
+                LinkedHashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName()));
+                LinkedHashMap<String,XSRewards> tempXSReward = new LinkedHashMap<>();
 
                 for(Map.Entry<String,XSRewards> rewardMap : xsRewardsList.entrySet()) {
 
@@ -233,7 +233,7 @@ public class XSUtils {
                 }
 
             } else {
-                Bukkit.broadcastMessage("NOT HAVE REWARD");
+                //Bukkit.broadcastMessage("NOT HAVE REWARD");
             }
 
         }

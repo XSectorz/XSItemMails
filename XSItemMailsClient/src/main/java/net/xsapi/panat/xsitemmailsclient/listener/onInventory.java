@@ -80,6 +80,10 @@ public class onInventory implements Listener {
 
         Player p = (Player) e.getWhoClicked();
 
+        if(e.getClickedInventory() == null) {
+            return;
+        }
+
         if(!e.getClickedInventory().equals(e.getView().getBottomInventory()) && e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU).getString("settings.title")))) {
 
             int slot = e.getSlot();
@@ -184,7 +188,7 @@ public class onInventory implements Listener {
             e.setCancelled(true);
             int slot = e.getSlot();
 
-            if(XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
+            if(!e.getClickedInventory().equals(e.getView().getBottomInventory()) && XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
                 String key = XSHandler.getPlayerGUISection().get(p).get(slot);
 
                 if (key.equalsIgnoreCase("close")) {

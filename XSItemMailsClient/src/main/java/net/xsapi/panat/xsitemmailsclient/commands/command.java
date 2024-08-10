@@ -2,6 +2,7 @@ package net.xsapi.panat.xsitemmailsclient.commands;
 
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
+import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.handler.XS_ITEMS_EDITOR_TOPICS;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
@@ -25,10 +26,21 @@ public class command implements CommandExecutor {
                     p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY),p,null));
                 } else if(args.length == 1) {
                     if(args[0].equalsIgnoreCase("editor")) {
+
+                        if(!p.hasPermission("xsitemmails.editor")) {
+                            XSUtils.sendMessageFromConfig("cancel_create_fail",p);
+                            return false;
+                        }
+
                         p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_MAIN_MENU),p,null));
                     }
                 } else if(args.length == 2) {
                     if(args[0].equalsIgnoreCase("cancel")) {
+
+                        if(!p.hasPermission("xsitemmails.cancel")) {
+                            XSUtils.sendMessageFromConfig("cancel_create_fail",p);
+                            return false;
+                        }
 
                         String type = args[1];
 
@@ -45,6 +57,12 @@ public class command implements CommandExecutor {
                 } else if(args.length == 4) {
 
                     if(args[0].equalsIgnoreCase("give")) {
+
+                        if(!p.hasPermission("xsitemmails.give")) {
+                            XSUtils.sendMessageFromConfig("cancel_create_fail",p);
+                            return false;
+                        }
+
                         String playerName = args[1];
                         String idKey = args[2];
 
@@ -64,7 +82,11 @@ public class command implements CommandExecutor {
                             XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.GIVE_ITEM_SENT_TO_SERVER+"<SPLIT>"
                             +idKey+";"+amount+";"+playerName+";"+XSHandler.getServerClient()+";"+commandSender.getName());
 
+                            String successMsg = messagesConfig.getConfig().getString("sent_reward_success");
+                            String prefix = messagesConfig.getConfig().getString("prefix");
+                            successMsg = successMsg.replace("%reward%",idKey).replace("%amount%",String.valueOf(amount)).replace("%player%",playerName);
 
+                            p.sendMessage(XSUtils.decodeText(prefix + successMsg));
 
                         } catch (NumberFormatException nfe) {
                             XSUtils.sendMessageFromConfig("only_number",p);
@@ -77,6 +99,42 @@ public class command implements CommandExecutor {
 
             }
 
+        } else {
+            if(command.getName().equalsIgnoreCase("xsitemmails")) {
+                if(args.length == 4) {
+
+                    if(args[0].equalsIgnoreCase("give")) {
+
+                        String playerName = args[1];
+                        String idKey = args[2];
+
+                        try {
+                            int amount = Integer.parseInt(args[3]);
+
+                            if(amount < 1) {
+                                commandSender.sendMessage("Only positive number");
+                                return false;
+                            }
+
+                            if(!XSHandler.getXsItemmailsHashMap().containsKey(idKey)) {
+                                commandSender.sendMessage("Item key is invalid");
+                                return false;
+                            }
+
+                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(), XS_REDIS_MESSAGES.GIVE_ITEM_SENT_TO_SERVER+"<SPLIT>"
+                                    +idKey+";"+amount+";"+playerName+";"+XSHandler.getServerClient()+";"+commandSender.getName());
+
+                            commandSender.sendMessage("[DEBUG] sent " + idKey + " x" + amount + " to " + playerName);
+
+                        } catch (NumberFormatException nfe) {
+                            commandSender.sendMessage("Only number");
+                            return false;
+                        }
+
+                    }
+
+                }
+            }
         }
         return false;
     }

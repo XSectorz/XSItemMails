@@ -201,6 +201,16 @@ public class XSRedisHandler {
                                 Gson gson = new Gson();
                                 String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
 
+
+                                //core.getPlugin().getLogger().info("DEBUG...");
+                                for(String server : mainConfig.getConfig().getStringList("group-servers."+serverGroup)) {
+                                    //core.getPlugin().getLogger().info("SERVER " + server);
+                                    if(!server.equalsIgnoreCase(serverClient)) {
+                                        //core.getPlugin().getLogger().info("SENT TO " + server);
+                                        XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(server), XS_REDIS_MESSAGES.SENT_PLAYER_REWARD_TO_CLIENT+"<SPLIT>"+dataJSON);
+                                    }
+                                }
+
                                 if(XSHandler.getItemmailsList(serverGroup).containsKey(xsRewards.getIdKeyReward())) {
                                     XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT+"<SPLIT>"
                                     +"reward_check_pass;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON);

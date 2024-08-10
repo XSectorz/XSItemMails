@@ -109,13 +109,13 @@ public class XSDatabaseHandler {
             String selectQuery = "SELECT * FROM xsitemmails_bungee_" + serverGroup;
             ResultSet resultSet = statement.executeQuery(selectQuery);
 
-            HashMap<Integer,HashMap<String,XSRewards>> mapData = new HashMap<>();
+            LinkedHashMap<Integer,LinkedHashMap<String,XSRewards>> mapData = new LinkedHashMap<>();
 
             while (resultSet.next()) {
                 int reference =  resultSet.getInt("Reference");
                 String itemData = resultSet.getString("itemData");
 
-                HashMap<String,XSRewards> rewardData = new HashMap<>();
+                LinkedHashMap<String,XSRewards> rewardData = new LinkedHashMap<>();
 
                 for(String reward : itemData.split(";")) {
 
@@ -154,7 +154,7 @@ public class XSDatabaseHandler {
 
            // String query = "UPDATE xsitemmails_bungee_" + serverGroup + " SET itemData = ? WHERE Reference = ?";
 
-            for(Map.Entry<Integer,HashMap<String,XSRewards>> rewardList : XSHandler.getPlayerRewardData().get(serverGroup).entrySet()) {
+            for(Map.Entry<Integer,LinkedHashMap<String,XSRewards>> rewardList : XSHandler.getPlayerRewardData().get(serverGroup).entrySet()) {
 
                // PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
 
@@ -223,7 +223,7 @@ public class XSDatabaseHandler {
                 if(XSHandler.getPlayerRewardData().get(serverGroup).containsKey(id)) {
                     XSHandler.getPlayerRewardData().get(serverGroup).get(id).put(uuid.toString(),new XSRewards(idReward,amount));
                 } else {
-                    HashMap<String, XSRewards> rewardMap = new HashMap<>();
+                    LinkedHashMap<String, XSRewards> rewardMap = new LinkedHashMap<>();
                     rewardMap.put(uuid.toString(), new XSRewards(idReward, amount));
                     XSHandler.getPlayerRewardData().get(serverGroup).put(id,rewardMap);
                 }

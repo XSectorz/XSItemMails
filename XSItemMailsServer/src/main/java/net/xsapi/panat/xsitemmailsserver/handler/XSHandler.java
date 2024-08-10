@@ -15,20 +15,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class XSHandler {
 
     //<server>:<p_id>:<data>
-    private static HashMap<String,Integer> playerDataReference = new HashMap<>();
-    private static HashMap<String,HashMap<Integer,HashMap<String,XSRewards>>> playerRewardData = new HashMap<>();
-    private static HashMap<String,HashMap<String, XSItemmails>> itemmailsList = new HashMap<>();
+    private static LinkedHashMap<String,Integer> playerDataReference = new LinkedHashMap<>();
+    private static LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,XSRewards>>> playerRewardData = new LinkedHashMap<>();
+    private static LinkedHashMap<String,LinkedHashMap<String, XSItemmails>> itemmailsList = new LinkedHashMap<>();
     private static ArrayList<String> updatedKey = new ArrayList<>();
 
     public static HashMap<String,Integer> getPlayerDataReference() {
         return playerDataReference;
     }
 
-    public static HashMap<String, HashMap<Integer, HashMap<String,XSRewards>>> getPlayerRewardData() {
+    public static LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>>> getPlayerRewardData() {
         return playerRewardData;
     }
 
@@ -114,10 +115,10 @@ public class XSHandler {
 
     public static void loadDataEachServer() {
         for(String group : mainConfig.getConfig().getSection("group-servers").getKeys()) {
-            itemmailsList.put(group,new HashMap<>());
+            itemmailsList.put(group,new LinkedHashMap<>());
             loadDataFromSQL(group);
 
-            XSHandler.getPlayerRewardData().put(group,new HashMap<>());
+            XSHandler.getPlayerRewardData().put(group,new LinkedHashMap<>());
             XSDatabaseHandler.loadPlayerReward(group);
         }
         sendDataToEachServer();
@@ -169,7 +170,7 @@ public class XSHandler {
             PreparedStatement preparedStatement = connection.prepareStatement(getAllGuild);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            HashMap<String,XSItemmails> itemsList = new HashMap<>();
+            LinkedHashMap<String,XSItemmails> itemsList = new LinkedHashMap<>();
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");

@@ -18,44 +18,45 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class XSHandler {
 
-    private static HashMap<String, Integer> playerDataReference = new HashMap<>();
-    private static HashMap<Integer, HashMap<String,XSRewards>> xsRewardsHashMap = new HashMap<>();
-    private static HashMap<String, XSItemmails> xsItemmailsHashMap = new HashMap<>();
-    private static HashMap<Player, Inventory> playerOpenInventory = new HashMap<>();
-    private static HashMap<Player, String> playerEditorKey = new HashMap<>();
-    private static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> playerCreatorTopics = new HashMap<>();
+    private static LinkedHashMap<String, Integer> playerDataReference = new LinkedHashMap<>();
+    private static LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> xsRewardsHashMap = new LinkedHashMap<>();
+    private static LinkedHashMap<String, XSItemmails> xsItemmailsHashMap = new LinkedHashMap<>();
+    private static LinkedHashMap<Player, Inventory> playerOpenInventory = new LinkedHashMap<>();
+    private static LinkedHashMap<Player, String> playerEditorKey = new LinkedHashMap<>();
+    private static LinkedHashMap<Player, XS_ITEMS_EDITOR_TOPICS> playerCreatorTopics = new LinkedHashMap<>();
 
-    private static HashMap<Player,Integer> playerPage = new HashMap<>();
-    private static HashMap<Player,HashMap<Integer,String>> playerGUISection = new HashMap<>();
+    private static LinkedHashMap<Player,Integer> playerPage = new LinkedHashMap<>();
+    private static LinkedHashMap<Player,LinkedHashMap<Integer,String>> playerGUISection = new LinkedHashMap<>();
 
     private static String serverClient;
 
-    public static HashMap<Integer,HashMap<String,XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
+    public static LinkedHashMap<Integer,LinkedHashMap<String,XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
 
-    public static HashMap<String,Integer> getPlayerDataReference() { return playerDataReference; }
+    public static LinkedHashMap<String,Integer> getPlayerDataReference() { return playerDataReference; }
 
-    public static void setXsRewardsHashMap(HashMap<Integer, HashMap<String,XSRewards>> map) {
+    public static void setXsRewardsHashMap(LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> map) {
         xsRewardsHashMap = map;
     }
 
-    public static HashMap<Player, XS_ITEMS_EDITOR_TOPICS> getPlayerCreatorTopics() {
+    public static LinkedHashMap<Player, XS_ITEMS_EDITOR_TOPICS> getPlayerCreatorTopics() {
         return playerCreatorTopics;
     }
-    public static HashMap<Player, String> getPlayerEditorKey() {
+    public static LinkedHashMap<Player, String> getPlayerEditorKey() {
         return playerEditorKey;
     }
 
-    public static HashMap<Player,HashMap<Integer,String>> getPlayerGUISection() {
+    public static LinkedHashMap<Player,LinkedHashMap<Integer,String>> getPlayerGUISection() {
         return playerGUISection;
     }
 
-    public static HashMap<Player,Integer> getPlayerPage() {
+    public static LinkedHashMap<Player,Integer> getPlayerPage() {
         return playerPage;
     }
-    public static HashMap<Player,Inventory> getPlayerOpenInventory() {
+    public static LinkedHashMap<Player,Inventory> getPlayerOpenInventory() {
         return playerOpenInventory;
     }
 
@@ -71,7 +72,7 @@ public class XSHandler {
         return xsItemmailsHashMap;
     }
 
-    public static void setXsItemmailsHashMap(HashMap<String,XSItemmails> dataMap) {
+    public static void setXsItemmailsHashMap(LinkedHashMap<String,XSItemmails> dataMap) {
         xsItemmailsHashMap = dataMap;
     }
 
@@ -100,7 +101,7 @@ public class XSHandler {
 
     }
 
-    public static void setPlayerDataReference(HashMap<String,Integer> data) {
+    public static void setPlayerDataReference(LinkedHashMap<String,Integer> data) {
         playerDataReference = data;
     }
 

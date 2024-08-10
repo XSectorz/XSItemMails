@@ -11,14 +11,14 @@ import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class XSRedisHandler {
 
@@ -97,7 +97,7 @@ public class XSRedisHandler {
                                 String itemName = args.split(";")[3];
 
                                 Gson gson = new Gson();
-                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+                                LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
@@ -115,7 +115,7 @@ public class XSRedisHandler {
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SEND_DATA_FROM_SERVER)) {
                                 String dataJSON = args.split(";")[0];
                                 Gson gson = new Gson();
-                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+                                LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
@@ -124,7 +124,7 @@ public class XSRedisHandler {
                                 String playerName = args.split(";")[1];
                                 String serverClient = args.split(";")[2];
                                 Gson gson = new Gson();
-                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+                                LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
@@ -144,7 +144,7 @@ public class XSRedisHandler {
                                 String serverClient = args.split(";")[3];
                                 String idKey = args.split(";")[4];
                                 Gson gson = new Gson();
-                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+                                LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
@@ -169,7 +169,7 @@ public class XSRedisHandler {
                                 String playerName = args.split(";")[1];
                                 String serverClient = args.split(";")[2];
                                 Gson gson = new Gson();
-                                HashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, XSItemmails>>(){}.getType());
+                                LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
                                 XSHandler.setXsItemmailsHashMap(dataList);
 
@@ -187,9 +187,10 @@ public class XSRedisHandler {
                                 String dataJSON = args.split(";")[0];
 
                                 Gson gson = new Gson();
-                                HashMap<Integer, HashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer,  HashMap<String,XSRewards>>>(){}.getType());
+                                LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<Integer,  LinkedHashMap<String,XSRewards>>>(){}.getType());
 
                                 XSHandler.setXsRewardsHashMap(dataList);
+                               // Bukkit.getLogger().info("SET NEW DATA LIST.....");
 
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT_SPECIFIC)) {
 
@@ -203,12 +204,11 @@ public class XSRedisHandler {
                                 String dataJSON = args.split(";")[0];
 
                                 Gson gson = new Gson();
-                                HashMap<String, Integer> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<String, Integer>>(){}.getType());
+                                LinkedHashMap<String, Integer> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, Integer>>(){}.getType());
 
-                                for(Map.Entry<String,Integer> data : dataList.entrySet()) {
+                               /* for(Map.Entry<String,Integer> data : dataList.entrySet()) {
                                     Bukkit.broadcastMessage("Player " + data.getKey() + " with id " + data.getValue());
-                                }
-
+                                }*/
                                 XSHandler.setPlayerDataReference(dataList);
 
                             }  else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT)) {
@@ -221,7 +221,7 @@ public class XSRedisHandler {
 
                                 //Set new data before do something
                                 Gson gson = new Gson();
-                                HashMap<Integer, HashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<HashMap<Integer,  HashMap<String,XSRewards>>>(){}.getType());
+                                LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<Integer,  LinkedHashMap<String,XSRewards>>>(){}.getType());
                                 XSHandler.setXsRewardsHashMap(dataList);
 
                                 Player p = Bukkit.getPlayer(playerName);
@@ -230,9 +230,60 @@ public class XSRedisHandler {
 
                                     XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(rewardID);
 
-                                    Bukkit.getLogger().info("Reward: " + xsItemmails.getRewardItems());
-                                    Bukkit.getLogger().info("Command: " + xsItemmails.getRewardCommands());
-                                    Bukkit.getLogger().info("Count: " + rewardCount);
+                                    //Bukkit.getLogger().info("Reward: " + xsItemmails.getRewardItems());
+                                    //Bukkit.getLogger().info("Command: " + xsItemmails.getRewardCommands());
+                                    //Bukkit.getLogger().info("Count: " + rewardCount);
+
+                                    for(String rewardItem : xsItemmails.getRewardItems()) {
+
+                                        ItemStack it = XSUtils.itemStackFromBase64(rewardItem);
+
+                                        it.setAmount(it.getAmount()*rewardCount);
+
+                                        p.getInventory().addItem(it);
+
+                                    }
+
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            for(String data : xsItemmails.getRewardCommands()) {
+
+                                                String type = data.split(" ")[0];
+
+                                                String command = String.join(" ", Arrays.copyOfRange(data.split(" "), 1, data.split(" ").length));
+                                                int caseReward = -1;
+
+                                                if(command.contains("%count%")) {
+                                                    caseReward = 0;
+                                                    command = command.replace("%count%",String.valueOf(rewardCount));
+                                                } else {
+                                                    caseReward = 1;
+                                                }
+                                                command = command.replace("%player%",p.getName());
+
+                                                CommandSender commandSender;
+
+                                                if(type.equalsIgnoreCase("[PLAYER]")) {
+                                                    commandSender = p;
+                                                } else {
+                                                    commandSender = Bukkit.getConsoleSender();
+                                                }
+
+                                                //Bukkit.broadcastMessage("RUN " + command);
+                                                if(caseReward == 1) {
+                                                    for(int i = 0 ; i < rewardCount ; i++) {
+                                                        Bukkit.dispatchCommand(commandSender,command);
+                                                    }
+                                                } else {
+                                                    Bukkit.dispatchCommand(commandSender,command);
+                                                }
+
+
+                                            }
+                                        }
+                                    }, 1L);
+
 
                                 } else {
                                     Bukkit.getLogger().info("Player : " + playerName + " fail to get " + rewardID + " with " + rewardCount);
@@ -246,7 +297,13 @@ public class XSRedisHandler {
 
                                 int currentPage = (int) Math.ceil((double) rewardSize /(double) sizeSlot);
 
-                                XSHandler.getPlayerPage().put(p,currentPage);
+                                //p.sendMessage("reward " + rewardSize + " / " + sizeSlot);
+                                //p.sendMessage("Current" + currentPage);
+                                //p.sendMessage("Player Page" +   XSHandler.getPlayerPage().get(p));
+
+                                if((XSHandler.getPlayerPage().get(p) * sizeSlot )+ 1 > rewardSize) {
+                                    XSHandler.getPlayerPage().put(p,currentPage);
+                                }
                                 XSUtils.updateInventoryContent(fileConfiguration,p,null);
 
 
