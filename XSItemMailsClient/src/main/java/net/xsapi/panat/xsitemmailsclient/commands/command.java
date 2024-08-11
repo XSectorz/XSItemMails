@@ -8,6 +8,7 @@ import net.xsapi.panat.xsitemmailsclient.handler.XS_ITEMS_EDITOR_TOPICS;
 import net.xsapi.panat.xsitemmailsclient.redis.XSRedisHandler;
 import net.xsapi.panat.xsitemmailsclient.redis.XS_REDIS_MESSAGES;
 import net.xsapi.panat.xsitemmailsclient.utils.XSUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,11 @@ public class command implements CommandExecutor {
             if(command.getName().equalsIgnoreCase("xsitemmails")) {
 
                 if(args.length == 0) {
+
+                    if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) {
+                        XSHandler.getPlayerEditOtherKey().remove(p.getName());
+                    }
+
                     p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_INVENTORY),p,null));
                 } else if(args.length == 1) {
                     if(args[0].equalsIgnoreCase("editor")) {
@@ -53,6 +59,24 @@ public class command implements CommandExecutor {
                             }
                         }
 
+                    } else if(args[0].equalsIgnoreCase("edit")) {
+
+                        if(!p.hasPermission("xsitemmails.edit")) {
+                            XSUtils.sendMessageFromConfig("cancel_create_fail",p);
+                            return false;
+                        }
+
+                        String playerName = args[1];
+
+                        if(!XSHandler.getPlayerDataReference().containsKey(playerName)) {
+                            XSUtils.sendMessageFromConfig("player_null",p);
+                            return false;
+                        }
+
+                        //Bukkit.broadcastMessage("ID Ref: " + XSHandler.getPlayerDataReference().get(playerName));
+
+                        XSHandler.getPlayerEditOtherKey().put(p.getName(),playerName);
+                        p.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY),p,null));
                     }
                 } else if(args.length == 4) {
 
@@ -65,6 +89,11 @@ public class command implements CommandExecutor {
 
                         String playerName = args[1];
                         String idKey = args[2];
+
+                        if(!XSHandler.getPlayerDataReference().containsKey(playerName)) {
+                            XSUtils.sendMessageFromConfig("player_null",p);
+                            return false;
+                        }
 
                         try {
                             int amount = Integer.parseInt(args[3]);

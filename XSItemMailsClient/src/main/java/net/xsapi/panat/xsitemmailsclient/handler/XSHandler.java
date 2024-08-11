@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 
 public class XSHandler {
 
+    private static LinkedHashMap<String, String> playerEditOtherKey = new LinkedHashMap<>();
     private static LinkedHashMap<String, Integer> playerDataReference = new LinkedHashMap<>();
     private static LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> xsRewardsHashMap = new LinkedHashMap<>();
     private static LinkedHashMap<String, XSItemmails> xsItemmailsHashMap = new LinkedHashMap<>();
@@ -37,6 +38,10 @@ public class XSHandler {
     public static LinkedHashMap<Integer,LinkedHashMap<String,XSRewards>> getXsRewardsHashMap() { return  xsRewardsHashMap; }
 
     public static LinkedHashMap<String,Integer> getPlayerDataReference() { return playerDataReference; }
+
+    public static LinkedHashMap<String,String> getPlayerEditOtherKey() {
+        return playerEditOtherKey;
+    }
 
     public static void setXsRewardsHashMap(LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> map) {
         xsRewardsHashMap = map;

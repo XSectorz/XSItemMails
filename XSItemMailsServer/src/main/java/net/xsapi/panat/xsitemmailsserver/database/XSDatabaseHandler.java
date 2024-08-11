@@ -193,12 +193,12 @@ public class XSDatabaseHandler {
                         updateStatement.setInt(2, rewardList.getKey());
                         updateStatement.executeUpdate();
                         updateStatement.close();
-                        connection.close();
                     }
 
                 }
 
             }
+            connection.close();
 
         }   catch (SQLException e) {
             throw new RuntimeException(e);

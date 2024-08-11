@@ -78,6 +78,10 @@ public class XSUtils {
     public static Inventory createInventoryFromConfig(FileConfiguration file,Player p,XSItemmails xsItemmails) {
 
         String title = XSUtils.decodeText(file.getString("settings.title"));
+        if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) {
+            title = title.replace("%target%",XSHandler.getPlayerEditOtherKey().get(p.getName()));
+        }
+
         int size = file.getInt("settings.size");
 
         XSHandler.getPlayerGUISection().put(p,new LinkedHashMap<>());
@@ -135,15 +139,20 @@ public class XSUtils {
                 inv.setItem(slot,new ItemStack(Material.AIR));
             }
 
+            String idKey = p.getName();
 
-            if(XSHandler.getXsRewardsHashMap().containsKey(XSHandler.getPlayerDataReference().get(p.getName()))) {
+            if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) { //editing other reward
+                idKey = XSHandler.getPlayerEditOtherKey().get(p.getName());
+            }
+
+            if(XSHandler.getXsRewardsHashMap().containsKey(XSHandler.getPlayerDataReference().get(idKey))) {
 
                 int sizeSlot = fileConfiguration.getStringList("settings.additional_info.rewards_slot").size();
 
                // Bukkit.broadcastMessage("HAVE REWARD KEY : " + XSHandler.getPlayerDataReference().get(p.getName()));
                // Bukkit.broadcastMessage("REWARD SIZE : " + XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName())).size());
 
-                LinkedHashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(p.getName()));
+                LinkedHashMap<String,XSRewards> xsRewardsList = XSHandler.getXsRewardsHashMap().get(XSHandler.getPlayerDataReference().get(idKey));
                 LinkedHashMap<String,XSRewards> tempXSReward = new LinkedHashMap<>();
 
                 for(Map.Entry<String,XSRewards> rewardMap : xsRewardsList.entrySet()) {
@@ -212,8 +221,15 @@ public class XSUtils {
                     }
 
                     ArrayList<String> arrayList = new ArrayList();
-                    for(String lore : mainConfig.getConfig().getStringList("settings.rewards_click_to_claim")) {
-                        arrayList.add(XSUtils.decodeText(lore));
+
+                    if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) {
+                        for(String lore : mainConfig.getConfig().getStringList("settings.edit_remove_lore")) {
+                            arrayList.add(XSUtils.decodeText(lore));
+                        }
+                    } else {
+                        for(String lore : mainConfig.getConfig().getStringList("settings.rewards_click_to_claim")) {
+                            arrayList.add(XSUtils.decodeText(lore));
+                        }
                     }
 
                     if(itemMeta.hasLore()) {
@@ -233,7 +249,7 @@ public class XSUtils {
                 }
 
             } else {
-                //Bukkit.broadcastMessage("NOT HAVE REWARD");
+              //  Bukkit.broadcastMessage("NOT HAVE REWARD");
             }
 
         }

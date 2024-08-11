@@ -309,6 +309,32 @@ public class XSRedisHandler {
 
 
 
+                            } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.DELETE_REWARD_SPECIFIC_PLAYER_TO_CLIENT)) {
+                                String dataJSON = args.split(";")[0];
+                                String senderName = args.split(";")[1];
+
+                                Gson gson = new Gson();
+                                LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<Integer,  LinkedHashMap<String,XSRewards>>>(){}.getType());
+                                XSHandler.setXsRewardsHashMap(dataList);
+
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        FileConfiguration fileConfiguration = menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY);
+                                        int sizeSlot = fileConfiguration.getStringList("settings.additional_info.rewards_slot").size();
+                                        int playerIDRef = XSHandler.getPlayerDataReference().get(XSHandler.getPlayerEditOtherKey().get(senderName));
+                                        int rewardSize = XSHandler.getXsRewardsHashMap().get(playerIDRef).size();
+
+                                        int currentPage = (int) Math.ceil((double) rewardSize /(double) sizeSlot);
+
+                                        Player p = Bukkit.getPlayer(senderName);
+
+                                        if((XSHandler.getPlayerPage().get(p) * sizeSlot )+ 1 > rewardSize) {
+                                            XSHandler.getPlayerPage().put(p,currentPage);
+                                        }
+                                        XSUtils.updateInventoryContent(fileConfiguration,p,null);
+                                    }
+                                }, 1L);
                             }
                         }
 
