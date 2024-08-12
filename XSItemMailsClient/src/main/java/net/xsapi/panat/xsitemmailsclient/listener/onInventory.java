@@ -215,32 +215,36 @@ public class onInventory implements Listener {
                     }
                 }
             }
-        } else if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY).getString("settings.title")).replace("%target%",XSHandler.getPlayerEditOtherKey().get(p.getName())))) {
+        } else {
+            if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) {
+                if(e.getView().getTitle().equalsIgnoreCase(XSUtils.decodeText(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY).getString("settings.title")).replace("%target%",XSHandler.getPlayerEditOtherKey().get(p.getName())))) {
 
-            e.setCancelled(true);
-            int slot = e.getSlot();
+                    e.setCancelled(true);
+                    int slot = e.getSlot();
 
-            if(!e.getClickedInventory().equals(e.getView().getBottomInventory()) && XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
-                String key = XSHandler.getPlayerGUISection().get(p).get(slot);
+                    if(!e.getClickedInventory().equals(e.getView().getBottomInventory()) && XSHandler.getPlayerGUISection().get(p).containsKey(slot)) {
+                        String key = XSHandler.getPlayerGUISection().get(p).get(slot);
 
-                if(e.getClick().equals(ClickType.DROP)) {
-                   // p.sendMessage(key);
+                        if(e.getClick().equals(ClickType.DROP)) {
+                            // p.sendMessage(key);
 
-                    String targetName = XSHandler.getPlayerEditOtherKey().get(p.getName());
-                    int idRef = XSHandler.getPlayerDataReference().get(targetName);
+                            String targetName = XSHandler.getPlayerEditOtherKey().get(p.getName());
+                            int idRef = XSHandler.getPlayerDataReference().get(targetName);
 
-                    XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.DELETE_REWARD_SPECIFIC_PLAYER_TO_SERVER+"<SPLIT>"+
-                            idRef+";"+key+";"+p.getName()+";"+XSHandler.getServerClient());
-                } else if(e.getClick().equals(ClickType.LEFT)) {
-                    if (key.equalsIgnoreCase("close")) {
-                        p.closeInventory();
-                    } else if(key.equalsIgnoreCase("next_button_inventory_reward")) {
-                        XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)+1);
-                        XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY),p,null);
-                    } else if(key.equalsIgnoreCase("back_button_inventory_reward")) {
-                        if(XSHandler.getPlayerPage().get(p) > 1) {
-                            XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)-1);
-                            XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY),p,null);
+                            XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.DELETE_REWARD_SPECIFIC_PLAYER_TO_SERVER+"<SPLIT>"+
+                                    idRef+";"+key+";"+p.getName()+";"+XSHandler.getServerClient());
+                        } else if(e.getClick().equals(ClickType.LEFT)) {
+                            if (key.equalsIgnoreCase("close")) {
+                                p.closeInventory();
+                            } else if(key.equalsIgnoreCase("next_button_inventory_reward")) {
+                                XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)+1);
+                                XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY),p,null);
+                            } else if(key.equalsIgnoreCase("back_button_inventory_reward")) {
+                                if(XSHandler.getPlayerPage().get(p) > 1) {
+                                    XSHandler.getPlayerPage().put(p,XSHandler.getPlayerPage().get(p)-1);
+                                    XSUtils.updateInventoryContent(menuConfig.getConfig(XS_MENU_FILE.XS_OTHER_INVENTORY),p,null);
+                                }
+                            }
                         }
                     }
                 }
