@@ -77,7 +77,9 @@ public class XSHandler {
 
     public static void sendPlayerDataReferenceToSpecificSubServer(String serverClient) {
         Gson gson = new Gson();
-        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference());
+        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference()).replace(";",":");
+        //core.getPlugin().getLogger().info(dataJSON);
+
         XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT+"<SPLIT>"+dataJSON);
     }
 
