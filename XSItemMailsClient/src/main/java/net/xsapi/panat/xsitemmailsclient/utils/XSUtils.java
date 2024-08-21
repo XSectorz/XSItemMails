@@ -171,6 +171,11 @@ public class XSUtils {
 
                 startIndex = (XSHandler.getPlayerPage().get(p)-1)*sizeSlot;
                 endIndex = Math.min(startIndex + sizeSlot-1, tempXSReward.size());
+                if(endIndex < 0) {
+                    endIndex = 0;
+                }
+
+
                 int slotNext = fileConfiguration.getInt("settings.additional_info.next_button.slot");
                 int slotBack = fileConfiguration.getInt("settings.additional_info.back_button.slot");
 

@@ -301,8 +301,13 @@ public class XSRedisHandler {
                                 //p.sendMessage("Current" + currentPage);
                                 //p.sendMessage("Player Page" +   XSHandler.getPlayerPage().get(p));
 
-                                if((XSHandler.getPlayerPage().get(p) * sizeSlot )+ 1 > rewardSize) {
-                                    XSHandler.getPlayerPage().put(p,currentPage);
+
+                                if(rewardSize == 0) {
+                                    XSHandler.getPlayerPage().put(p,1);
+                                } else {
+                                    if((XSHandler.getPlayerPage().get(p) * sizeSlot )+ 1 > rewardSize) {
+                                        XSHandler.getPlayerPage().put(p,currentPage);
+                                    }
                                 }
                                 XSUtils.updateInventoryContent(fileConfiguration,p,null);
 
