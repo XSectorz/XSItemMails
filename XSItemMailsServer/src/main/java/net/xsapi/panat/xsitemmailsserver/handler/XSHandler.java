@@ -35,7 +35,10 @@ public class XSHandler {
 
     public static HashMap<String, XSItemmails> getItemmailsList(String server) {
 
-        return itemmailsList.get(server);
+        if(itemmailsList.containsKey(server)) {
+            return itemmailsList.get(server);
+        }
+        return new HashMap<>();
     }
 
     public static ArrayList<String> getUpdatedKey() {
@@ -78,7 +81,7 @@ public class XSHandler {
     public static void sendPlayerDataReferenceToSpecificSubServer(String serverClient) {
         Gson gson = new Gson();
         String dataJSON = gson.toJson(XSHandler.getPlayerDataReference()).replace(";",":");
-        //core.getPlugin().getLogger().info(dataJSON);
+       // core.getPlugin().getLogger().info(dataJSON);
 
         XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT+"<SPLIT>"+dataJSON);
     }
@@ -86,7 +89,7 @@ public class XSHandler {
     public static void sendPlayerDataReferenceToSubServer(String serverGroup) {
 
         Gson gson = new Gson();
-        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference());
+        String dataJSON = gson.toJson(XSHandler.getPlayerDataReference()).replace(";",":");;
 
         for(String group : mainConfig.getConfig().getStringList("group-servers."+serverGroup)) {
             XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(group), XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT+"<SPLIT>"+dataJSON);

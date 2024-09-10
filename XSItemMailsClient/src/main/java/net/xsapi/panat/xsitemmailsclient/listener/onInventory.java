@@ -55,7 +55,7 @@ public class onInventory implements Listener {
 
             int size = tempRewardList.size();
 
-            Bukkit.broadcastMessage("tempRewardList size: " + size);
+            //Bukkit.broadcastMessage("tempRewardList size: " + size);
 
             for(String dataItem : itemRewardsList) {
                 if(tempRewardList.contains(dataItem)) {
@@ -63,7 +63,7 @@ public class onInventory implements Listener {
                 }
             }
 
-            Bukkit.broadcastMessage("size : " + size);
+            //Bukkit.broadcastMessage("size : " + size);
 
             if(size != 0 || tempRewardList.isEmpty()) { //something change!
                 xsItemmails.setRewardItems(tempRewardList);

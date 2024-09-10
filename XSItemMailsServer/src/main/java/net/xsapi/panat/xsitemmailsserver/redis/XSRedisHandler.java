@@ -185,7 +185,6 @@ public class XSRedisHandler {
                             } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.REQUEST_PLAYER_DATA_TO_SERVER)) {
 
                                 String serverClient = args.split(";")[0];
-
                                 XSHandler.sendPlayerDataReferenceToSpecificSubServer(serverClient);
                             } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_ITEM_REQUEST_TO_SERVER)) {
 

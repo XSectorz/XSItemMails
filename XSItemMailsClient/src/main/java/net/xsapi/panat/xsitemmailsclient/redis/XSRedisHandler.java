@@ -107,6 +107,7 @@ public class XSRedisHandler {
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(core.getPlugin(), new Runnable() {
                                         @Override
                                         public void run() {
+                                            XSHandler.getPlayerEditorKey().put(Bukkit.getPlayer(playerName),itemName);
                                             sender.openInventory(XSUtils.createInventoryFromConfig(menuConfig.getConfig(XS_MENU_FILE.XS_ITEM_CREATE),sender,XSHandler.getXsItemmailsHashMap().get(itemName)));
                                         }
                                     }, 1L);
@@ -202,6 +203,8 @@ public class XSRedisHandler {
 
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT)) {
                                 String dataJSON = args.split(";")[0];
+
+                                //core.getPlugin().getLogger().info(dataJSON);
 
                                 Gson gson = new Gson();
                                 LinkedHashMap<String, Integer> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, Integer>>(){}.getType());

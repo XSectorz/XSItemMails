@@ -5,6 +5,7 @@ import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.configLoader;
 import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
+import net.xsapi.panat.xsitemmailsclient.core;
 import net.xsapi.panat.xsitemmailsclient.listener.eventLoader;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
 import net.xsapi.panat.xsitemmailsclient.objects.XSRewards;

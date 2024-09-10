@@ -119,17 +119,19 @@ public class XSDatabaseHandler {
 
                 for (String reward : itemData.split(";")) {
 
-                    String idReward = reward.split(":")[0];
-                    int amount = Integer.parseInt(reward.split(":")[1]);
+                    if(reward.split(":").length == 2) {
+                        String idReward = reward.split(":")[0];
+                        int amount = Integer.parseInt(reward.split(":")[1]);
 
-                    if (!XSHandler.getItemmailsList(serverGroup).containsKey(idReward)) {
-                        continue;
+                        if (!XSHandler.getItemmailsList(serverGroup).containsKey(idReward)) {
+                            continue;
+                        }
+
+                        UUID uuid = UUID.randomUUID();
+                        XSRewards xsRewards = new XSRewards(idReward, amount);
+
+                        rewardData.put(uuid.toString(), xsRewards);
                     }
-
-                    UUID uuid = UUID.randomUUID();
-                    XSRewards xsRewards = new XSRewards(idReward, amount);
-
-                    rewardData.put(uuid.toString(), xsRewards);
 
                 }
                 mapData.put(reference,rewardData);
