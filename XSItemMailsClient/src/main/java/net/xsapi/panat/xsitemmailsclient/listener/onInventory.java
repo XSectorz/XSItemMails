@@ -38,7 +38,6 @@ public class onInventory implements Listener {
             XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(XSHandler.getPlayerEditorKey().get(p));
             ArrayList<String> itemRewardsList = xsItemmails.getRewardItems();
             ArrayList<String> tempRewardList = new ArrayList<>();
-            int size = itemRewardsList.size();
 
             for(String slotStr : menuConfig.getConfig(XS_MENU_FILE.XS_REWARD_ITEMS).getStringList("settings.additional_info.items_slot")) {
 
@@ -54,13 +53,19 @@ public class onInventory implements Listener {
 
             }
 
-            for(String dataItem : tempRewardList) {
-                if(itemRewardsList.contains(dataItem)) {
+            int size = tempRewardList.size();
+
+            Bukkit.broadcastMessage("tempRewardList size: " + size);
+
+            for(String dataItem : itemRewardsList) {
+                if(tempRewardList.contains(dataItem)) {
                     size--;
                 }
             }
 
-            if(size != 0 || xsItemmails.getRewardItems().isEmpty()) { //something change!
+            Bukkit.broadcastMessage("size : " + size);
+
+            if(size != 0 || tempRewardList.isEmpty()) { //something change!
                 xsItemmails.setRewardItems(tempRewardList);
 
                 Gson gson = new Gson();
@@ -210,6 +215,37 @@ public class onInventory implements Listener {
                             p.closeInventory();
                             return;
                         }
+
+                        String xsRewardsKey = XSHandler.getXsRewardsHashMap().get(playerIDRef).get(key).getIdKeyReward();
+                        int count = XSHandler.getXsRewardsHashMap().get(playerIDRef).get(key).getCount();
+                        int countStack = 0;
+
+                        XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(xsRewardsKey);
+
+                        for(String rewardItem : xsItemmails.getRewardItems()) {
+                            ItemStack it = XSUtils.itemStackFromBase64(rewardItem);
+
+                            int totalCount = it.getAmount()*count;
+
+                            //Bukkit.broadcastMessage("Count : " + totalCount + " Max Stack " + it.getMaxStackSize());
+                            //Bukkit.broadcastMessage("Added : " + ((double)totalCount/(double) it.getMaxStackSize()) + " ; " + Math.ceil((double)totalCount/(double)it.getMaxStackSize()));
+
+                            countStack = (int) (countStack + Math.ceil((double)totalCount/(double)it.getMaxStackSize()));
+                        }
+
+                        int emptySlot = 0;
+                        for (int i = 0; i < 36; i++) {
+
+                            if(p.getInventory().getContents()[i] == null) {
+                                emptySlot++;
+                            }
+
+                        }
+                        if(emptySlot < countStack) {
+                            XSUtils.sendMessageFromConfig("inventory_slot_full", p);
+                            return;
+                        }
+
 
                         XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.SENT_ITEM_REQUEST_TO_SERVER+"<SPLIT>"+playerIDRef+";"+key+";"+p.getName()+";"+XSHandler.getServerClient());
                     }

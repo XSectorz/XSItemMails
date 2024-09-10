@@ -117,19 +117,19 @@ public class XSDatabaseHandler {
 
                 LinkedHashMap<String,XSRewards> rewardData = new LinkedHashMap<>();
 
-                for(String reward : itemData.split(";")) {
+                for (String reward : itemData.split(";")) {
 
                     String idReward = reward.split(":")[0];
                     int amount = Integer.parseInt(reward.split(":")[1]);
 
-                    if(!XSHandler.getItemmailsList(serverGroup).containsKey(idReward)) {
+                    if (!XSHandler.getItemmailsList(serverGroup).containsKey(idReward)) {
                         continue;
                     }
 
                     UUID uuid = UUID.randomUUID();
-                    XSRewards xsRewards = new XSRewards(idReward,amount);
+                    XSRewards xsRewards = new XSRewards(idReward, amount);
 
-                    rewardData.put(uuid.toString(),xsRewards);
+                    rewardData.put(uuid.toString(), xsRewards);
 
                 }
                 mapData.put(reference,rewardData);

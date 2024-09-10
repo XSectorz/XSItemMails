@@ -15,4 +15,5 @@ item_key_not_found: "<red>รางวัลดังกล่าวไม่ม
 permission: "<red>ไม่สามารถใช้งานได้เนื่องจากคุณไม่มีสิทธิ"
 sent_reward_success: "<white>ทำการส่งรางวัล <color:#03BA00>%reward% <white>จำนวน<color:#03BA00> %amount%<white> ไปยังผู้เล่น <color:#03BA00>%player% <white>เรียบร้อยแล้ว"
 player_null: "<red>ผู้เล่นดังกล่าวไม่พบในระบบ"
+inventory_slot_full: "<red>กระเป๋าของคุณมีช่องว่างไม่เพียงพอที่จะรับไอเทม"
 reward_null: "<red>รางวัลดังกล่าวไม่พบอยู่ในระบบอาจจะถูกลบก่อนที่คุณจะทำการรับ"

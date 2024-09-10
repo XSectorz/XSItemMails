@@ -238,8 +238,19 @@ public class XSRedisHandler {
 
                                         ItemStack it = XSUtils.itemStackFromBase64(rewardItem);
 
-                                        it.setAmount(it.getAmount()*rewardCount);
+                                        int totalAmount = it.getAmount()*rewardCount;
 
+                                        int splitToStack = (int) Math.floor((double) totalAmount / (double) it.getMaxStackSize());
+
+                                        //Bukkit.broadcastMessage("Split to stack : " + splitToStack + " and " + (totalAmount-splitToStack*it.getMaxStackSize()));
+
+                                        for(int i = 0 ; i < splitToStack ; i ++) {
+
+                                            it.setAmount(it.getMaxStackSize());
+                                            p.getInventory().addItem(it);
+                                        }
+
+                                        it.setAmount((totalAmount-splitToStack*it.getMaxStackSize()));
                                         p.getInventory().addItem(it);
 
                                     }
