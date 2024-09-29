@@ -108,6 +108,7 @@ public class XSHandler {
         Gson gson = new Gson();
         String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
         for(String group : mainConfig.getConfig().getStringList("group-servers."+serverGroup)) {
+            core.getPlugin().getLogger().info("sent to " + group);
             XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(group), XS_REDIS_MESSAGES.SENT_PLAYER_REWARD_TO_CLIENT+"<SPLIT>"+dataJSON);
         }
     }

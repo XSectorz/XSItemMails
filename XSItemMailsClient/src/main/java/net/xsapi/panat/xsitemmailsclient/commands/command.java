@@ -1,6 +1,7 @@
 package net.xsapi.panat.xsitemmailsclient.commands;
 
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
+import net.xsapi.panat.xsitemmailsclient.config.mainConfig;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
 import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
@@ -24,6 +25,11 @@ public class command implements CommandExecutor {
             if(command.getName().equalsIgnoreCase("xsitemmails")) {
 
                 if(args.length == 0) {
+
+                    if(!mainConfig.getConfig().getBoolean("settings.allow_gui")) {
+                        XSUtils.sendMessageFromConfig("only_at_spawn",p);
+                        return false;
+                    }
 
                     if(XSHandler.getPlayerEditOtherKey().containsKey(p.getName())) {
                         XSHandler.getPlayerEditOtherKey().remove(p.getName());

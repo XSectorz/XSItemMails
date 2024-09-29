@@ -17,3 +17,5 @@ sent_reward_success: "<white>ทำการส่งรางวัล <color:#
 player_null: "<red>ผู้เล่นดังกล่าวไม่พบในระบบ"
 inventory_slot_full: "<red>กระเป๋าของคุณมีช่องว่างไม่เพียงพอที่จะรับไอเทม"
 reward_null: "<red>รางวัลดังกล่าวไม่พบอยู่ในระบบอาจจะถูกลบก่อนที่คุณจะทำการรับ"
+only_at_spawn: "<red>กรุณาเปิดใช้งานตู้จดหมายที่ Spawn เท่านั้น"
+wait_a_seconds: "<white>กรุณารอเวลา <color:#03BA00>%time% <white>วินาทีก่อนดำเนินการอีกครั้ง"

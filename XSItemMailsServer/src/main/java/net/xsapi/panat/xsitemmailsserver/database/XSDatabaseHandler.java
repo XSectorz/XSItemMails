@@ -135,6 +135,7 @@ public class XSDatabaseHandler {
 
                 }
                 mapData.put(reference,rewardData);
+                core.getPlugin().getLogger().info("REF : " + reference + " reward " + rewardData);
             }
 
             XSHandler.getPlayerRewardData().put(serverGroup,mapData);
@@ -223,9 +224,11 @@ public class XSDatabaseHandler {
                 UUID uuid = UUID.randomUUID();
 
                 if(XSHandler.getPlayerRewardData().get(serverGroup).containsKey(id)) {
+                    core.getPlugin().getLogger().info("Added " + uuid + " idReward " + idReward + " x " + amount);
                     XSHandler.getPlayerRewardData().get(serverGroup).get(id).put(uuid.toString(),new XSRewards(idReward,amount));
                 } else {
                     LinkedHashMap<String, XSRewards> rewardMap = new LinkedHashMap<>();
+                    core.getPlugin().getLogger().info("Added " + uuid + " idReward " + idReward + " x " + amount);
                     rewardMap.put(uuid.toString(), new XSRewards(idReward, amount));
                     XSHandler.getPlayerRewardData().get(serverGroup).put(id,rewardMap);
                 }

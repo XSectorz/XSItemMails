@@ -20,11 +20,13 @@ import org.bukkit.inventory.Inventory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class XSHandler {
 
     private static LinkedHashMap<String, String> playerEditOtherKey = new LinkedHashMap<>();
     private static LinkedHashMap<String, Integer> playerDataReference = new LinkedHashMap<>();
+    private static LinkedHashMap<UUID, Long> cooldownReward = new LinkedHashMap<>();
     private static LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> xsRewardsHashMap = new LinkedHashMap<>();
     private static LinkedHashMap<String, XSItemmails> xsItemmailsHashMap = new LinkedHashMap<>();
     private static LinkedHashMap<Player, Inventory> playerOpenInventory = new LinkedHashMap<>();
@@ -46,6 +48,10 @@ public class XSHandler {
 
     public static void setXsRewardsHashMap(LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> map) {
         xsRewardsHashMap = map;
+    }
+
+    public static java.util.LinkedHashMap<UUID, Long> getCooldownReward() {
+        return cooldownReward;
     }
 
     public static LinkedHashMap<Player, XS_ITEMS_EDITOR_TOPICS> getPlayerCreatorTopics() {

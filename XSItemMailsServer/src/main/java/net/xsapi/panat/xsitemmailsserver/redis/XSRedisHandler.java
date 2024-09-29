@@ -196,6 +196,17 @@ public class XSRedisHandler {
 
                                 XSRewards xsRewards = XSHandler.getPlayerRewardData().get(serverGroup).get(idRef).get(uniqueKey);
 
+                                if(XSHandler.getPlayerRewardData().get(serverGroup) == null) {
+                                    core.getPlugin().getLogger().info("NULL SERVER " + serverGroup);
+                                }
+                                if(XSHandler.getPlayerRewardData().get(serverGroup).get(idRef) == null) {
+                                    core.getPlugin().getLogger().info("NULL IDREF " + idRef);
+                                }
+                                if(XSHandler.getPlayerRewardData().get(serverGroup).get(idRef).get(uniqueKey) == null) {
+                                    core.getPlugin().getLogger().info("NULL uniqueKey " + uniqueKey);
+                                    return;
+                                }
+
                                 XSHandler.getPlayerRewardData().get(serverGroup).get(idRef).remove(uniqueKey);
                                 Gson gson = new Gson();
                                 String dataJSON = gson.toJson(XSHandler.getPlayerRewardData().get(serverGroup));
@@ -210,12 +221,15 @@ public class XSRedisHandler {
                                     }
                                 }
 
+                                core.getPlugin().getLogger().info("SERVER " + serverGroup);
+                                core.getPlugin().getLogger().info("IDKEY " + xsRewards.getIdKeyReward());
                                 if(XSHandler.getItemmailsList(serverGroup).containsKey(xsRewards.getIdKeyReward())) {
+                                    core.getPlugin().getLogger().info("sent " + uniqueKey);
                                     XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT+"<SPLIT>"
-                                    +"reward_check_pass;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON);
+                                    +"reward_check_pass;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON+";"+uniqueKey+";"+idRef);
                                 } else {
                                     XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsClientChannel(serverClient),XS_REDIS_MESSAGES.SENT_ITEM_SENT_TO_CLIENT+"<SPLIT>"
-                                            +"reward_check_fail;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON);
+                                            +"reward_check_fail;"+xsRewards.getIdKeyReward()+";"+xsRewards.getCount()+";"+playerName+";"+dataJSON+";"+uniqueKey+";"+idRef);
                                 }
 
                             } else if(xsRedisMessages.equals(XS_REDIS_MESSAGES.DELETE_REWARD_SPECIFIC_PLAYER_TO_SERVER)) {

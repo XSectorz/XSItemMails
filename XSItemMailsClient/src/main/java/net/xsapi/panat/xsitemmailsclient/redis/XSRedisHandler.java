@@ -99,8 +99,6 @@ public class XSRedisHandler {
                                 Gson gson = new Gson();
                                 LinkedHashMap<String, XSItemmails> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<String, XSItemmails>>(){}.getType());
 
-                                XSHandler.setXsItemmailsHashMap(dataList);
-
                                 if(XSHandler.getServerClient().equalsIgnoreCase(serverClient) && Bukkit.getPlayer(playerName)!= null) {
                                     Player sender = Bukkit.getPlayer(playerName);
                                     XSUtils.sendMessageFromConfig("create_success",sender);
@@ -191,6 +189,9 @@ public class XSRedisHandler {
                                 LinkedHashMap<Integer, LinkedHashMap<String,XSRewards>> dataList = gson.fromJson(dataJSON, new TypeToken<LinkedHashMap<Integer,  LinkedHashMap<String,XSRewards>>>(){}.getType());
 
                                 XSHandler.setXsRewardsHashMap(dataList);
+                                core.getPlugin().getLogger().info("---------------------");
+                                core.getPlugin().getLogger().info(dataJSON);
+                                core.getPlugin().getLogger().info("---------------------");
                                // Bukkit.getLogger().info("SET NEW DATA LIST.....");
 
                             } else if (xsRedisMessages.equals(XS_REDIS_MESSAGES.SENT_PLAYER_DATA_TO_CLIENT_SPECIFIC)) {
@@ -221,6 +222,8 @@ public class XSRedisHandler {
                                 int rewardCount = Integer.parseInt(args.split(";")[2]);
                                 String playerName = args.split(";")[3];
                                 String dataJSON = args.split(";")[4];
+                                String uniqueKey = args.split(";")[5];
+                                int playerID = Integer.parseInt(args.split(";")[6]);
 
                                 //Set new data before do something
                                 Gson gson = new Gson();
@@ -229,7 +232,15 @@ public class XSRedisHandler {
 
                                 Player p = Bukkit.getPlayer(playerName);
 
+                                core.getPlugin().getLogger().info("GET reward_check_pass " + response + " uniqueKey " + uniqueKey);
+
                                 if(response.equalsIgnoreCase("reward_check_pass")) {
+
+                                    core.getPlugin().getLogger().info("Try to check " + uniqueKey + " ID " + playerID + " " + XSHandler.getXsRewardsHashMap().get(playerID));
+                                    if(XSHandler.getXsRewardsHashMap().get(playerID).containsKey(uniqueKey)) {
+                                        XSHandler.getXsRewardsHashMap().get(playerID).remove(uniqueKey);
+                                        core.getPlugin().getLogger().info("remove " + uniqueKey);
+                                    }
 
                                     XSItemmails xsItemmails = XSHandler.getXsItemmailsHashMap().get(rewardID);
 

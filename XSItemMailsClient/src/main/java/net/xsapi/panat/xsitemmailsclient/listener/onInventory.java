@@ -5,6 +5,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.xsapi.panat.xsitemmailsclient.config.XS_MENU_FILE;
 import net.xsapi.panat.xsitemmailsclient.config.menuConfig;
+import net.xsapi.panat.xsitemmailsclient.config.messagesConfig;
 import net.xsapi.panat.xsitemmailsclient.handler.XSHandler;
 import net.xsapi.panat.xsitemmailsclient.handler.XS_ITEMS_EDITOR_TOPICS;
 import net.xsapi.panat.xsitemmailsclient.objects.XSItemmails;
@@ -216,6 +217,23 @@ public class onInventory implements Listener {
                             return;
                         }
 
+                        if (XSHandler.getCooldownReward().containsKey(p.getUniqueId())) {
+                            if(System.currentTimeMillis()-XSHandler.getCooldownReward().get(p.getUniqueId()) <= 0L) {
+
+                                double seconds = (XSHandler.getCooldownReward().get(p.getUniqueId())  - System.currentTimeMillis()) / 1000.0;
+
+                                double secondsRounded = Math.round(seconds * 10.0) / 10.0;
+
+                                Audience senderAudience = (Audience) p;
+                                senderAudience.sendMessage(MiniMessage.builder().build().deserialize(messagesConfig.customConfig.getString("prefix") +
+                                        messagesConfig.customConfig.getString("wait_a_seconds").replace("%time%",secondsRounded+"")));
+
+                                return;
+                            }
+                        }
+
+                        XSHandler.getCooldownReward().put(p.getUniqueId(),System.currentTimeMillis()+2000L);
+
                         String xsRewardsKey = XSHandler.getXsRewardsHashMap().get(playerIDRef).get(key).getIdKeyReward();
                         int count = XSHandler.getXsRewardsHashMap().get(playerIDRef).get(key).getCount();
                         int countStack = 0;
@@ -245,8 +263,6 @@ public class onInventory implements Listener {
                             XSUtils.sendMessageFromConfig("inventory_slot_full", p);
                             return;
                         }
-
-
                         XSRedisHandler.sendRedisMessage(XSRedisHandler.getRedisItemMailsServerChannel(),XS_REDIS_MESSAGES.SENT_ITEM_REQUEST_TO_SERVER+"<SPLIT>"+playerIDRef+";"+key+";"+p.getName()+";"+XSHandler.getServerClient());
                     }
                 }
